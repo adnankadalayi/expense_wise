@@ -1,6 +1,8 @@
 import 'package:expense_wise/bottom_navigation/controllers/home_controller.dart';
+import 'package:expense_wise/bottom_navigation/screens/add_transaction.dart';
 import 'package:expense_wise/bottom_navigation/screens/home_screen.dart';
 import 'package:expense_wise/bottom_navigation/screens/settings_screen.dart';
+import 'package:expense_wise/bottom_navigation/screens/stat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -16,11 +18,13 @@ class MainScreen extends StatelessWidget {
         builder: (controller) {
           return IndexedStack(
             index: controller.selectedNavIndex.value,
-            children: const [
-              HomeScreen(),
-              Center(child: Text('Stats Page', style: TextStyle(fontSize: 24))),
-              Center(child: Text('Add Page', style: TextStyle(fontSize: 24))),
-              SettingsScreen(),
+            children: [
+              const HomeScreen(),
+              // const Center(
+              //     child: Text('Stats Page', style: TextStyle(fontSize: 24))),
+              StatisticsScreen(),
+              AddTransactionScreen(),
+              const SettingsScreen(),
               // Center(
               //     child: Text('Settings Page', style: TextStyle(fontSize: 24))),
             ],

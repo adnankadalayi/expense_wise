@@ -1,3 +1,4 @@
+import 'package:expense_wise/bottom_navigation/screens/add_transaction.dart';
 import 'package:expense_wise/bottom_navigation/screens/bottom_navigation_screen.dart';
 import 'package:expense_wise/bottom_navigation/screens/home_screen.dart';
 import 'package:expense_wise/core/app_theme.dart';
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
       getPages: [
         GetPage(name: '/', page: () => SplashScreen()),
         GetPage(name: '/main', page: () => MainScreen()),
+        GetPage(name: '/add', page: () => AddTransactionScreen()),
       ],
     );
   }
