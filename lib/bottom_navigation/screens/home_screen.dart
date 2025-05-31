@@ -200,7 +200,10 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                Get.toNamed('/all');
+                                // Get.toNamed('/all-transactions');
+                              },
                               child: const Text(
                                 'See All',
                                 style: TextStyle(
