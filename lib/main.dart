@@ -24,7 +24,9 @@ class MyApp extends StatelessWidget {
       title: 'ExpenseWise',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: Get.find<StorageService>().settings.darkMode
+          ? ThemeMode.dark
+          : ThemeMode.light,
       initialRoute: AppPages.INITIAL,
       getPages: AppPages.routes,
       debugShowCheckedModeBanner: false,

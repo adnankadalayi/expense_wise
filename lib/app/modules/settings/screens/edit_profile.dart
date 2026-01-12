@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class EditProfilePage extends StatelessWidget {
-  const EditProfilePage({Key? key}) : super(key: key);
+  const EditProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -197,7 +197,7 @@ class EditProfilePage extends StatelessWidget {
                         _buildFormGroup(
                           label: 'NATIONALITY',
                           child: Obx(() => DropdownButtonFormField<String>(
-                                value: controller.nationality.value,
+                                initialValue: controller.nationality.value,
                                 decoration:
                                     _inputDecoration('Select your nationality'),
                                 style: TextStyle(

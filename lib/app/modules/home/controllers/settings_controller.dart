@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:expense_wise/app/services/storage_service.dart';
+import 'package:expense_wise/app/services/pdf_service.dart';
+import 'package:isar_community/isar.dart';
+import 'package:expense_wise/app/data/models/settings.dart';
+import 'package:expense_wise/app/data/models/account.dart';
+import 'package:expense_wise/app/data/models/transaction.dart';
 
 class SettingsController extends GetxController
     with SingleGetTickerProviderMixin {
@@ -36,15 +42,13 @@ class SettingsController extends GetxController
       ),
     );
 
-    slideUpAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: animationController,
-        curve: const Interval(0.4, 0.7, curve: Curves.easeOut),
-      ),
-    );
+    slideUpAnimation =
+        Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: animationController,
+            curve: const Interval(0.4, 0.7, curve: Curves.easeOut),
+          ),
+        );
 
     fadeInRightAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
@@ -54,6 +58,33 @@ class SettingsController extends GetxController
     );
 
     animationController.forward();
+    _loadSettings();
+  }
+
+  final _storage = Get.find<StorageService>();
+
+  Future<void> _loadSettings() async {
+    final settings = await _storage.db.settings.where().findFirst();
+    if (settings != null) {
+      dailyReminders.value = settings.dailyReminders;
+      darkMode.value = settings.darkMode;
+      cloudBackup.value = settings.cloudBackup;
+
+      Get.changeThemeMode(settings.darkMode ? ThemeMode.dark : ThemeMode.light);
+    }
+  }
+
+  Future<void> _updateSettings() async {
+    final settings = await _storage.db.settings.where().findFirst();
+    if (settings != null) {
+      settings.dailyReminders = dailyReminders.value;
+      settings.darkMode = darkMode.value;
+      settings.cloudBackup = cloudBackup.value;
+
+      await _storage.db.writeTxn(() async {
+        await _storage.db.settings.put(settings);
+      });
+    }
   }
 
   @override
@@ -62,7 +93,42 @@ class SettingsController extends GetxController
     super.onClose();
   }
 
-  void toggleDailyReminders() => dailyReminders.toggle();
-  void toggleDarkMode() => darkMode.toggle();
-  void toggleCloudBackup() => cloudBackup.toggle();
+  void toggleDailyReminders() {
+    dailyReminders.toggle();
+    _updateSettings();
+  }
+
+  void toggleDarkMode() {
+    darkMode.toggle();
+    Get.changeThemeMode(darkMode.value ? ThemeMode.dark : ThemeMode.light);
+    _updateSettings();
+  }
+
+  void toggleCloudBackup() {
+    cloudBackup.toggle();
+    _updateSettings();
+  }
+
+  void exportPdf() async {
+    try {
+      final storage = Get.find<StorageService>();
+      final pdfService = PdfService();
+
+      final accounts = await storage.db.accounts.where().findAll();
+      final transactions = await storage.db.transactions
+          .where()
+          .sortByDateDesc()
+          .findAll();
+
+      await pdfService.generateAndShareReport(accounts, transactions);
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to generate PDF: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
 }

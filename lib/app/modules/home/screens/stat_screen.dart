@@ -1,6 +1,7 @@
 import 'package:expense_wise/app/modules/home/controllers/stats_screen_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:math';
 
 class StatisticsScreen extends StatelessWidget {
   const StatisticsScreen({super.key});
@@ -19,6 +20,7 @@ class StatisticsScreen extends StatelessWidget {
           ),
         ),
         child: SafeArea(
+          bottom: false,
           child: Column(
             children: [
               // Header
@@ -48,31 +50,35 @@ class StatisticsScreen extends StatelessWidget {
                             color: Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Obx(() => DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  value: controller.selectedPeriod.value,
-                                  icon: const Icon(Icons.keyboard_arrow_down,
-                                      color: Colors.white, size: 16),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  dropdownColor: const Color(0xFFF7B500),
-                                  items:
-                                      controller.periods.map((String period) {
-                                    return DropdownMenuItem<String>(
-                                      value: period,
-                                      child: Text(period),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    if (newValue != null) {
-                                      controller.selectPeriod(newValue);
-                                    }
-                                  },
+                          child: Obx(
+                            () => DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: controller.selectedPeriod.value,
+                                icon: const Icon(
+                                  Icons.keyboard_arrow_down,
+                                  color: Colors.white,
+                                  size: 16,
                                 ),
-                              )),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                dropdownColor: const Color(0xFFF7B500),
+                                items: controller.periods.map((String period) {
+                                  return DropdownMenuItem<String>(
+                                    value: period,
+                                    child: Text(period),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  if (newValue != null) {
+                                    controller.selectPeriod(newValue);
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -95,6 +101,7 @@ class StatisticsScreen extends StatelessWidget {
                         ),
                       ),
                       child: SingleChildScrollView(
+                        // padding: const EdgeInsets.fromLTRB(24, 24, 24, 100),
                         padding: const EdgeInsets.all(24),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,36 +141,41 @@ class StatisticsScreen extends StatelessWidget {
             color: const Color(0xFFF7B500).withOpacity(0.1),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'May 2025 Overview',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF333333),
+          child: Obx(
+            () => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${controller.selectedPeriod.value} Overview',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF333333),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _StatItem(
-                    amount: '\$1,247',
-                    label: 'Total Spent',
-                  ),
-                  _StatItem(
-                    amount: '\$2,150',
-                    label: 'Total Income',
-                  ),
-                  _StatItem(
-                    amount: '\$903',
-                    label: 'Net Savings',
-                  ),
-                ],
-              ),
-            ],
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _StatItem(
+                      amount:
+                          '\$${controller.totalSpent.value.toStringAsFixed(0)}',
+                      label: 'Total Spent',
+                    ),
+                    _StatItem(
+                      amount:
+                          '\$${controller.totalIncome.value.toStringAsFixed(0)}',
+                      label: 'Total Income',
+                    ),
+                    _StatItem(
+                      amount:
+                          '\$${controller.netSavings.value.toStringAsFixed(0)}',
+                      label: 'Net Savings',
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -188,10 +200,41 @@ class StatisticsScreen extends StatelessWidget {
               height: 140,
               child: Stack(
                 children: [
-                  CustomPaint(
-                    size: const Size(140, 140),
-                    painter: DonutChartPainter(),
-                  ),
+                  Obx(() {
+                    // Prepare segments for painter
+                    final List<Map<String, dynamic>> segments = [];
+                    double startAngle = 0.0;
+                    final total = controller.totalSpent.value > 0
+                        ? controller.totalSpent.value
+                        : 1.0;
+
+                    for (var cat in controller.categoryData) {
+                      final double rawPercentage = cat['rawPercentage'];
+                      final sweepAngle = (rawPercentage / 100) * 2 * pi;
+
+                      segments.add({
+                        'color': cat['color'],
+                        'startAngle': startAngle,
+                        'sweepAngle': sweepAngle,
+                      });
+
+                      startAngle += sweepAngle;
+                    }
+
+                    if (segments.isEmpty) {
+                      // Placeholder if no data
+                      segments.add({
+                        'color': Colors.grey.shade300,
+                        'startAngle': 0.0,
+                        'sweepAngle': 2 * pi,
+                      });
+                    }
+
+                    return CustomPaint(
+                      size: const Size(140, 140),
+                      painter: DonutChartPainter(segments: segments),
+                    );
+                  }),
                   Center(
                     child: Container(
                       width: 80,
@@ -200,25 +243,27 @@ class StatisticsScreen extends StatelessWidget {
                         color: Colors.white,
                         shape: BoxShape.circle,
                       ),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '\$1,247',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF333333),
+                      child: Obx(
+                        () => Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '\$${controller.totalSpent.value.toStringAsFixed(0)}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF333333),
+                              ),
                             ),
-                          ),
-                          Text(
-                            'Total',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Color(0xFF666666),
+                            const Text(
+                              'Total',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Color(0xFF666666),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -236,43 +281,45 @@ class StatisticsScreen extends StatelessWidget {
       position: controller.categoriesSlideAnimation,
       child: FadeTransition(
         opacity: controller.categoriesFadeAnimation,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Categories',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF333333),
+        child: Obx(
+          () => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Categories',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF333333),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            ...controller.categoryData.asMap().entries.map((entry) {
-              int index = entry.key;
-              Map<String, dynamic> category = entry.value;
-              return TweenAnimationBuilder<double>(
-                duration: Duration(milliseconds: 600 + (index * 100)),
-                tween: Tween<double>(begin: 0.0, end: 1.0),
-                curve: Curves.easeOut,
-                builder: (context, value, child) {
-                  return Transform.translate(
-                    offset: Offset(30 * (1 - value), 0),
-                    child: Opacity(
-                      opacity: value,
-                      child: _CategoryItem(
-                        name: category['name'],
-                        percentage: category['percentage'],
-                        amount: category['amount'],
-                        color: category['color'],
-                        isLast: index == controller.categoryData.length - 1,
+              const SizedBox(height: 16),
+              ...controller.categoryData.asMap().entries.map((entry) {
+                int index = entry.key;
+                Map<String, dynamic> category = entry.value;
+                return TweenAnimationBuilder<double>(
+                  duration: Duration(milliseconds: 600 + (index * 100)),
+                  tween: Tween<double>(begin: 0.0, end: 1.0),
+                  curve: Curves.easeOut,
+                  builder: (context, value, child) {
+                    return Transform.translate(
+                      offset: Offset(30 * (1 - value), 0),
+                      child: Opacity(
+                        opacity: value,
+                        child: _CategoryItem(
+                          name: category['name'],
+                          percentage: category['percentage'],
+                          amount: category['amount'],
+                          color: category['color'],
+                          isLast: index == controller.categoryData.length - 1,
+                        ),
                       ),
-                    ),
-                  );
-                },
-              );
-            }).toList(),
-          ],
+                    );
+                  },
+                );
+              }),
+            ],
+          ),
         ),
       ),
     );
@@ -283,10 +330,7 @@ class _StatItem extends StatelessWidget {
   final String amount;
   final String label;
 
-  const _StatItem({
-    required this.amount,
-    required this.label,
-  });
+  const _StatItem({required this.amount, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -345,10 +389,7 @@ class _CategoryItem extends StatelessWidget {
           Container(
             width: 12,
             height: 12,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -389,6 +430,10 @@ class _CategoryItem extends StatelessWidget {
 }
 
 class DonutChartPainter extends CustomPainter {
+  final List<Map<String, dynamic>> segments;
+
+  DonutChartPainter({required this.segments});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -398,35 +443,6 @@ class DonutChartPainter extends CustomPainter {
 
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - 30) / 2;
-
-    // Define the segments with their colors and angles
-    final segments = [
-      {
-        'color': const Color(0xFFF7B500),
-        'startAngle': 0.0,
-        'sweepAngle': 2.27
-      }, // 36% -> 130°
-      {
-        'color': const Color(0xFFEF4444),
-        'startAngle': 2.27,
-        'sweepAngle': 1.22
-      }, // 19% -> 70°
-      {
-        'color': const Color(0xFF22C55E),
-        'startAngle': 3.49,
-        'sweepAngle': 0.70
-      }, // 12% -> 40°
-      {
-        'color': const Color(0xFF8B5CF6),
-        'startAngle': 4.19,
-        'sweepAngle': 0.87
-      }, // 14% -> 50°
-      {
-        'color': const Color(0xFF06B6D4),
-        'startAngle': 5.06,
-        'sweepAngle': 1.22
-      }, // 19% -> 70°
-    ];
 
     for (final segment in segments) {
       paint.color = segment['color'] as Color;
@@ -441,20 +457,5 @@ class DonutChartPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'ExpenseWise Statistics',
-      home: const StatisticsScreen(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
