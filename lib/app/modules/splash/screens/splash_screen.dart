@@ -1,4 +1,4 @@
-import 'package:expense_wise/splash_screen/controllers/splash_controller.dart';
+import 'package:expense_wise/app/modules/splash/controllers/splash_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

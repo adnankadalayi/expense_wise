@@ -1,8 +1,8 @@
-import 'package:expense_wise/bottom_navigation/controllers/home_controller.dart';
-import 'package:expense_wise/bottom_navigation/screens/add_transaction.dart';
-import 'package:expense_wise/bottom_navigation/screens/home_screen.dart';
-import 'package:expense_wise/bottom_navigation/screens/settings_screen.dart';
-import 'package:expense_wise/bottom_navigation/screens/stat_screen.dart';
+import 'package:expense_wise/app/modules/home/controllers/home_controller.dart';
+import 'package:expense_wise/app/modules/home/screens/add_transaction.dart';
+import 'package:expense_wise/app/modules/home/screens/home_screen.dart';
+import 'package:expense_wise/app/modules/home/screens/settings_screen.dart';
+import 'package:expense_wise/app/modules/home/screens/stat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

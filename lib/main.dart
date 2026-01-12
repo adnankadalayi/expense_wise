@@ -1,16 +1,18 @@
-import 'package:expense_wise/all_transaction/screens/all_transaction.dart';
-import 'package:expense_wise/bottom_navigation/screens/add_transaction.dart';
-import 'package:expense_wise/bottom_navigation/screens/bottom_navigation_screen.dart';
-import 'package:expense_wise/bottom_navigation/screens/home_screen.dart';
-import 'package:expense_wise/bottom_navigation/screens/settings_screen.dart';
-import 'package:expense_wise/core/app_theme.dart';
-import 'package:expense_wise/settings/screens/edit_profile.dart';
-import 'package:expense_wise/splash_screen/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-void main() {
+import 'app/routes/app_pages.dart';
+import 'app/services/storage_service.dart';
+import 'app/theme/app_theme.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initServices();
   runApp(const MyApp());
+}
+
+Future<void> initServices() async {
+  await Get.putAsync(() => StorageService().init());
 }
 
 class MyApp extends StatelessWidget {
@@ -22,17 +24,10 @@ class MyApp extends StatelessWidget {
       title: 'ExpenseWise',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode:
-          ThemeMode.system, // Switch between light and dark based on system
-      initialRoute: '/',
-      getPages: [
-        GetPage(name: '/', page: () => SplashScreen()),
-        GetPage(name: '/main', page: () => MainScreen()),
-        GetPage(name: '/add', page: () => AddTransactionScreen()),
-        GetPage(name: '/all', page: () => AllTransactionsScreen()),
-        GetPage(name: '/settings', page: () => SettingsScreen()),
-        GetPage(name: '/edit-profile', page: () => EditProfilePage()),
-      ],
+      themeMode: ThemeMode.system,
+      initialRoute: AppPages.INITIAL,
+      getPages: AppPages.routes,
+      debugShowCheckedModeBanner: false,
     );
   }
 }
