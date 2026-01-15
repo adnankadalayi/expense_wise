@@ -1,3 +1,4 @@
+import 'package:expense_wise/app/modules/home/bindings/home_binding.dart';
 import 'package:get/get.dart';
 
 import '../modules/home/screens/bottom_navigation_screen.dart';
@@ -20,7 +21,7 @@ class AppPages {
     GetPage(
       name: _Paths.HOME,
       page: () => const MainScreen(),
-      binding: AccountsBinding(),
+      binding: HomeBinding(),
     ),
     GetPage(name: _Paths.SPLASH, page: () => SplashScreen()),
     GetPage(name: _Paths.TRANSACTIONS, page: () => AllTransactionsScreen()),

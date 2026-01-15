@@ -3,127 +3,113 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:math';
 
-class StatisticsScreen extends StatelessWidget {
-  const StatisticsScreen({super.key});
+class StatsHeader extends StatelessWidget {
+  const StatsHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(StatisticsController());
 
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFF5C842), Color(0xFFF7B500)],
-          ),
-        ),
-        child: SafeArea(
-          bottom: false,
-          child: Column(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+      child: SlideTransition(
+        position: controller.headerSlideAnimation,
+        child: FadeTransition(
+          opacity: controller.headerFadeAnimation,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Header
-              SlideTransition(
-                position: controller.headerSlideAnimation,
-                child: FadeTransition(
-                  opacity: controller.headerFadeAnimation,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Statistics',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 0,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Obx(
-                            () => DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: controller.selectedPeriod.value,
-                                icon: const Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: Colors.white,
-                                  size: 16,
-                                ),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                dropdownColor: const Color(0xFFF7B500),
-                                items: controller.periods.map((String period) {
-                                  return DropdownMenuItem<String>(
-                                    value: period,
-                                    child: Text(period),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) {
-                                  if (newValue != null) {
-                                    controller.selectPeriod(newValue);
-                                  }
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+              const Text(
+                'Statistics',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-
-              // Content Area
-              Expanded(
-                child: SlideTransition(
-                  position: controller.contentSlideAnimation,
-                  child: FadeTransition(
-                    opacity: controller.contentFadeAnimation,
-                    child: Container(
-                      decoration: const BoxDecoration(
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 0,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Obx(
+                  () => DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: controller.selectedPeriod.value,
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down,
                         color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          topRight: Radius.circular(24),
-                        ),
+                        size: 16,
                       ),
-                      child: SingleChildScrollView(
-                        // padding: const EdgeInsets.fromLTRB(24, 24, 24, 100),
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Spending Overview
-                            _buildSpendingOverview(controller),
-                            const SizedBox(height: 24),
-
-                            // Chart
-                            _buildChart(controller),
-                            const SizedBox(height: 24),
-
-                            // Categories
-                            _buildCategories(controller),
-                          ],
-                        ),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
                       ),
+                      dropdownColor: const Color(0xFF002E6E),
+                      items: controller.periods.map((String period) {
+                        return DropdownMenuItem<String>(
+                          value: period,
+                          child: Text(period),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          controller.selectPeriod(newValue);
+                        }
+                      },
                     ),
                   ),
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class StatsBody extends StatelessWidget {
+  const StatsBody({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.put(StatisticsController());
+
+    return SlideTransition(
+      position: controller.contentSlideAnimation,
+      child: FadeTransition(
+        opacity: controller.contentFadeAnimation,
+        child: Container(
+          // No rounded corners here, main screen handles it for consistency or we keep top rounded
+          // Actually, the main screen will likely apply the clip or the container itself.
+          // The white card in MainScreen will have the border radius.
+          // So this child just needs to fill it.
+          // BUT, if I remove the decoration here, the background will be transparent?
+          // No, MainScreen's AnimatedContainer checks the white background.
+          // So this widget should just be the content.
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Spending Overview
+                _buildSpendingOverview(controller),
+                const SizedBox(height: 24),
+
+                // Chart
+                _buildChart(controller),
+                const SizedBox(height: 24),
+
+                // Categories
+                _buildCategories(controller),
+              ],
+            ),
           ),
         ),
       ),
@@ -138,7 +124,7 @@ class StatisticsScreen extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: const Color(0xFFF7B500).withOpacity(0.1),
+            color: const Color(0xFF00BAF2).withOpacity(0.1),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Obx(

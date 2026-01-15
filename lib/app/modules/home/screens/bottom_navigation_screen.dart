@@ -1,36 +1,103 @@
 import 'package:expense_wise/app/modules/home/controllers/home_controller.dart';
+import 'package:expense_wise/app/modules/home/screens/add_transaction.dart';
 import 'package:expense_wise/app/modules/home/screens/home_screen.dart';
-import 'package:expense_wise/app/modules/home/screens/settings_screen.dart';
 import 'package:expense_wise/app/modules/home/screens/stat_screen.dart';
-import 'dart:ui';
+import 'package:expense_wise/app/modules/home/screens/settings_screen.dart';
+import 'package:expense_wise/app/modules/budgets/views/budgets_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:expense_wise/app/modules/accounts/views/accounts_view.dart';
-import 'package:expense_wise/app/modules/budgets/views/budgets_view.dart';
+import 'dart:ui';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(HomeController());
+    // Ensure controller is found
+    final controller = Get.find<HomeController>();
 
     return Scaffold(
-      extendBody: true,
-      body: GetBuilder<HomeController>(
-        builder: (controller) {
-          return IndexedStack(
-            index: controller.selectedNavIndex.value,
-            children: [
-              const HomeScreen(),
-              StatisticsScreen(),
-              BudgetsView(),
-              const SettingsScreen(),
-            ],
-          );
-        },
+      backgroundColor: const Color(0xFF002E6E), // Fallback
+      resizeToAvoidBottomInset: false, // Handle keyboard in stack if needed
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // 1. Shared Background Gradient
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF002E6E),
+                  Color(0xFF00BAF2),
+                ], // Paytm Dark Blue to Cyan
+              ),
+            ),
+          ),
+
+          // 2. Headers Layer (Top)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              bottom: false,
+              child: Obx(
+                () => IndexedStack(
+                  index: controller.selectedNavIndex.value,
+                  children: const [
+                    HomeHeader(),
+                    StatsHeader(),
+                    BudgetsHeader(),
+                    SettingsHeader(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // 3. Animated Content Card (Bottom Stack)
+          Obx(
+            () => AnimatedPositioned(
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.fastOutSlowIn,
+              top: controller.currentCardTop,
+              left: 0,
+              right: 0,
+              bottom: 0, // Extends to bottom
+              child: Container(
+                clipBehavior: Clip.antiAlias, // Clip top corners
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(32),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, -5),
+                    ),
+                  ],
+                ),
+                child: IndexedStack(
+                  index: controller.selectedNavIndex.value,
+                  children: const [
+                    HomeBody(),
+                    StatsBody(),
+                    BudgetsBody(),
+                    SettingsBody(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // 4. Bottom Navigation Bar
+          Positioned(bottom: 0, left: 0, right: 0, child: const BottomNavBar()),
+        ],
       ),
-      bottomNavigationBar: const BottomNavBar(),
     );
   }
 }
@@ -42,99 +109,121 @@ class BottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.8),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.5),
-                width: 1.5,
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(24, 0, 24, 34),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(32),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 30,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Obx(
+              () => _buildNavItem(
+                icon: Icons.home_rounded,
+                label: 'Home',
+                isSelected: controller.selectedNavIndex.value == 0,
+                onTap: () => controller.selectedNavIndex.value = 0,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildNavItem(controller, 0, Icons.home_rounded, 'Home'),
-                _buildNavItem(controller, 1, Icons.bar_chart_rounded, 'Stats'),
-                _buildNavItem(
-                  controller,
-                  2,
-                  Icons.account_balance_wallet_rounded,
-                  'Budgets',
-                ),
-                _buildNavItem(
-                  controller,
-                  3,
-                  Icons.settings_rounded,
-                  'Settings',
-                ),
-              ],
+            Obx(
+              () => _buildNavItem(
+                icon: Icons.bar_chart_rounded,
+                label: 'Stats',
+                isSelected: controller.selectedNavIndex.value == 1,
+                onTap: () => controller.selectedNavIndex.value = 1,
+              ),
             ),
-          ),
+            GestureDetector(
+              onTap: () => Get.to(() => const AddTransactionScreen()),
+              child: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF00BAF2), // Paytm Cyan
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF00BAF2).withOpacity(0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.add, color: Colors.white, size: 24),
+              ),
+            ),
+            Obx(
+              () => _buildNavItem(
+                icon: Icons.account_balance_wallet_rounded,
+                label: 'Budgets',
+                isSelected: controller.selectedNavIndex.value == 2,
+                onTap: () => controller.selectedNavIndex.value = 2,
+              ),
+            ),
+            Obx(
+              () => _buildNavItem(
+                icon: Icons.settings_rounded,
+                label: 'Settings',
+                isSelected: controller.selectedNavIndex.value == 3,
+                onTap: () => controller.selectedNavIndex.value = 3,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildNavItem(
-    HomeController controller,
-    int index,
-    IconData icon,
-    String label,
-  ) {
+  Widget _buildNavItem({
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
-      onTap: () {
-        controller.updateNavIndex(index);
-      },
-      child: Obx(() {
-        final isSelected = controller.selectedNavIndex.value == index;
-        return Column(
-          mainAxisSize: MainAxisSize.min,
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Colors.white.withOpacity(0.2)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.all(8),
-              decoration: isSelected
-                  ? BoxDecoration(
-                      color: const Color(0xFFF7B500).withOpacity(0.2),
-                      shape: BoxShape.circle,
-                    )
-                  : const BoxDecoration(
-                      color: Colors.transparent,
-                      shape: BoxShape.circle,
-                    ),
-              child: Icon(
-                icon,
-                size: 24,
-                color: isSelected ? const Color(0xFFF7B500) : Colors.black54,
-              ),
+            Icon(
+              icon,
+              color: isSelected ? Colors.white : Colors.grey.shade600,
+              size: 24,
             ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: isSelected ? const Color(0xFFF7B500) : Colors.black54,
+            if (isSelected) ...[
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
               ),
-            ),
+            ],
           ],
-        );
-      }),
+        ),
+      ),
     );
   }
 }

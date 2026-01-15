@@ -12,6 +12,8 @@ class Transaction {
 
   String? note;
 
+  String? subCategory;
+
   late DateTime date;
 
   @enumerated
@@ -20,6 +22,8 @@ class Transaction {
   final category = IsarLink<Category>();
 
   final account = IsarLink<Account>();
+
+  final transferAccount = IsarLink<Account>();
 }
 
 enum TransactionType { expense, income, transfer }

@@ -15,6 +15,16 @@ class HomeController extends GetxController with SingleGetTickerProviderMixin {
 
   var selectedNavIndex = 0.obs;
 
+  // Top offsets for the white card based on tab index
+  final Map<int, double> cardTopOffsets = {
+    0: 280.0, // Home: Below Balance Card
+    1: 120.0, // Stats: Below Title/Dropdown
+    2: 120.0, // Budgets: Below Title
+    3: 260.0, // Settings: Below Profile
+  };
+
+  double get currentCardTop => cardTopOffsets[selectedNavIndex.value] ?? 280.0;
+
   late AnimationController animationController;
   late Animation<double> fadeInLeftAnimation;
   late Animation<Offset> slideUpAnimation;

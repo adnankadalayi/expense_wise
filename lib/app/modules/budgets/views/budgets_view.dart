@@ -3,29 +3,56 @@ import 'package:expense_wise/app/modules/budgets/views/add_budget_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class BudgetsView extends StatelessWidget {
-  const BudgetsView({super.key});
+class BudgetsHeader extends StatelessWidget {
+  const BudgetsHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Ensure controller is available
+    Get.put(BudgetsController());
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Budgets',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              Get.to(() => const AddBudgetView());
+            },
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.add, color: Colors.white, size: 24),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class BudgetsBody extends StatelessWidget {
+  const BudgetsBody({super.key});
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(BudgetsController());
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Budgets', style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add, color: Colors.black),
-            onPressed: () {
-              Get.to(() => const AddBudgetView());
-            },
-          ),
-        ],
-      ),
-      body: Obx(() {
+    return Container(
+      child: Obx(() {
         if (controller.budgets.isEmpty) {
           return Center(
             child: Column(
@@ -52,7 +79,7 @@ class BudgetsView extends StatelessWidget {
 
         return ListView.builder(
           // padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(24),
           itemCount: controller.budgets.length,
           itemBuilder: (context, index) {
             final budget = controller.budgets[index];

@@ -16,6 +16,8 @@ class Category {
   late CategoryType type;
 
   bool isCustom = false;
+
+  List<String>? subCategories;
 }
 
 enum CategoryType { expense, income }

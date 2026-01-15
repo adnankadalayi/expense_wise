@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color primaryColor = Color(0xFFF5C842);
-  static const Color secondaryColor = Color(0xFFF7B500);
+  // Paytm Brand Colors
+  static const Color primaryColor = Color(0xFF002E6E); // Dark Blue
+  static const Color secondaryColor = Color(0xFF00BAF2); // Cyan
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -11,8 +12,8 @@ class AppTheme {
         primary: primaryColor,
         secondary: secondaryColor,
         surface: Colors.white,
-        onPrimary: Colors.black,
-        onSecondary: Colors.black,
+        onPrimary: Colors.white, // Text on primary should be white
+        onSecondary: Colors.white,
         onSurface: Colors.black,
       ),
       scaffoldBackgroundColor: Colors.white,
@@ -36,24 +37,24 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
-          foregroundColor: Colors.black,
+          backgroundColor: secondaryColor, // Use Cyan for actions
+          foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25),
           ),
           elevation: 10,
-          shadowColor: Colors.black.withOpacity(0.2),
+          shadowColor: secondaryColor.withOpacity(0.4),
         ),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: primaryColor,
-        foregroundColor: Colors.black,
+        foregroundColor: Colors.white,
         elevation: 0,
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: Colors.white,
-        selectedItemColor: primaryColor,
+        selectedItemColor: secondaryColor,
         unselectedItemColor: Colors.black.withOpacity(0.6),
       ),
     );
@@ -91,14 +92,14 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
+          backgroundColor: secondaryColor,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25),
           ),
           elevation: 10,
-          shadowColor: Colors.black.withOpacity(0.2),
+          shadowColor: secondaryColor.withOpacity(0.4),
         ),
       ),
       appBarTheme: AppBarTheme(
@@ -108,7 +109,7 @@ class AppTheme {
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: Colors.grey[900],
-        selectedItemColor: primaryColor,
+        selectedItemColor: secondaryColor,
         unselectedItemColor: Colors.white.withOpacity(0.6),
       ),
     );
