@@ -12,6 +12,8 @@ class SettingsController extends GetxController
   var dailyReminders = true.obs;
   var darkMode = false.obs;
   var cloudBackup = true.obs;
+  var currencyCode = 'USD'.obs;
+  var currencySymbol = '\$'.obs;
 
   late AnimationController animationController;
   late Animation<double> fadeInLeftAnimation;
@@ -69,6 +71,8 @@ class SettingsController extends GetxController
       dailyReminders.value = settings.dailyReminders;
       darkMode.value = settings.darkMode;
       cloudBackup.value = settings.cloudBackup;
+      currencyCode.value = settings.currencyCode;
+      currencySymbol.value = settings.currencySymbol;
 
       Get.changeThemeMode(settings.darkMode ? ThemeMode.dark : ThemeMode.light);
     }
@@ -80,6 +84,12 @@ class SettingsController extends GetxController
       settings.dailyReminders = dailyReminders.value;
       settings.darkMode = darkMode.value;
       settings.cloudBackup = cloudBackup.value;
+      settings.currencyCode = currencyCode.value;
+      settings.currencySymbol = currencySymbol.value;
+
+      // Update global state
+      _storage.currencyCode.value = currencyCode.value;
+      _storage.currencySymbol.value = currencySymbol.value;
 
       await _storage.db.writeTxn(() async {
         await _storage.db.settings.put(settings);
@@ -106,6 +116,12 @@ class SettingsController extends GetxController
 
   void toggleCloudBackup() {
     cloudBackup.toggle();
+    _updateSettings();
+  }
+
+  void changeCurrency(String code, String symbol) {
+    currencyCode.value = code;
+    currencySymbol.value = symbol;
     _updateSettings();
   }
 

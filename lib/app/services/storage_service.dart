@@ -12,6 +12,8 @@ import 'package:flutter/material.dart';
 class StorageService extends GetxService {
   late Isar db;
   late Settings settings;
+  final currencyCode = 'USD'.obs;
+  final currencySymbol = '\$'.obs;
 
   Future<StorageService> init() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -170,5 +172,7 @@ class StorageService extends GetxService {
     } else {
       settings = (await db.settings.where().findFirst())!;
     }
+    currencyCode.value = settings.currencyCode;
+    currencySymbol.value = settings.currencySymbol;
   }
 }

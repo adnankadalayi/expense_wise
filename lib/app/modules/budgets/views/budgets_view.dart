@@ -1,5 +1,6 @@
 import 'package:expense_wise/app/modules/budgets/controllers/budgets_controller.dart';
 import 'package:expense_wise/app/modules/budgets/views/add_budget_view.dart';
+import 'package:expense_wise/app/services/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -137,8 +138,8 @@ class BudgetsBody extends StatelessWidget {
                               ),
                               Text(
                                 isOverBudget
-                                    ? 'Over budget by \$${(spent - budget.amount).toStringAsFixed(0)}'
-                                    : '\$${remaining.toStringAsFixed(0)} left',
+                                    ? 'Over budget by ${Get.find<StorageService>().currencySymbol.value}${(spent - budget.amount).toStringAsFixed(0)}'
+                                    : '${Get.find<StorageService>().currencySymbol.value}${remaining.toStringAsFixed(0)} left',
                                 style: TextStyle(
                                   color: isOverBudget
                                       ? Colors.red
@@ -167,14 +168,14 @@ class BudgetsBody extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '\$${spent.toStringAsFixed(0)} spent',
+                              '${Get.find<StorageService>().currencySymbol.value}${spent.toStringAsFixed(0)} spent',
                               style: TextStyle(
                                 color: catColor,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             Text(
-                              '\$${budget.amount.toStringAsFixed(0)}',
+                              '${Get.find<StorageService>().currencySymbol.value}${budget.amount.toStringAsFixed(0)}',
                               style: const TextStyle(color: Colors.grey),
                             ),
                           ],

@@ -9,6 +9,7 @@ import '../modules/splash/screens/splash_screen.dart';
 import '../modules/accounts/views/accounts_view.dart';
 import '../modules/accounts/views/add_account_view.dart';
 import '../modules/accounts/bindings/accounts_binding.dart';
+import '../modules/settings/views/category_management_view.dart';
 
 part 'app_routes.dart';
 
@@ -36,6 +37,10 @@ class AppPages {
       name: _Paths.ADD_ACCOUNT,
       page: () => AddAccountView(),
       binding: AccountsBinding(),
+    ),
+    GetPage(
+      name: _Paths.CATEGORY_MANAGEMENT,
+      page: () => const CategoryManagementView(),
     ),
   ];
 }

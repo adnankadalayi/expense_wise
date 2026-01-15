@@ -88,7 +88,7 @@ class RecurringTransactionsView extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '\$${tx.amount.toStringAsFixed(0)}',
+                      '${Get.find<StorageService>().currencySymbol.value}${tx.amount.toStringAsFixed(0)}',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,

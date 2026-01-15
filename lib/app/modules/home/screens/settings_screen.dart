@@ -144,17 +144,21 @@ class SettingsBody extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildSettingsSection(controller, 'Preferences', [
-                _buildSettingItem(
-                  controller,
-                  index: 0,
-                  icon: '💰',
-                  iconColor: const Color(0xFFEF4444),
-                  iconBackground: const Color(0xFFFEE2E2),
-                  title: 'Currency',
-                  subtitle: 'USD (\$)',
-                  action: const Text(
-                    '›',
-                    style: TextStyle(fontSize: 16, color: Color(0xFFF7B500)),
+                Obx(
+                  () => _buildSettingItem(
+                    controller,
+                    index: 0,
+                    icon: '💰',
+                    iconColor: const Color(0xFFEF4444),
+                    iconBackground: const Color(0xFFFEE2E2),
+                    title: 'Currency',
+                    subtitle:
+                        '${controller.currencyCode.value} (${controller.currencySymbol.value})',
+                    onTap: () => _showCurrencyPicker(context, controller),
+                    action: const Text(
+                      '›',
+                      style: TextStyle(fontSize: 16, color: Color(0xFFF7B500)),
+                    ),
                   ),
                 ),
                 _buildSettingItem(
@@ -521,6 +525,114 @@ class SettingsBody extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showCurrencyPicker(
+    BuildContext context,
+    SettingsController controller,
+  ) {
+    final currencies = [
+      {'code': 'USD', 'symbol': '\$', 'name': 'US Dollar'},
+      {'code': 'EUR', 'symbol': '€', 'name': 'Euro'},
+      {'code': 'GBP', 'symbol': '£', 'name': 'British Pound'},
+      {'code': 'INR', 'symbol': '₹', 'name': 'Indian Rupee'},
+      {'code': 'JPY', 'symbol': '¥', 'name': 'Japanese Yen'},
+      {'code': 'CNY', 'symbol': '¥', 'name': 'Chinese Yuan'},
+      {'code': 'AUD', 'symbol': 'A\$', 'name': 'Australian Dollar'},
+      {'code': 'CAD', 'symbol': 'C\$', 'name': 'Canadian Dollar'},
+    ];
+
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Select Currency',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF333333),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Flexible(
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: currencies.length,
+                separatorBuilder: (context, index) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final currency = currencies[index];
+                  final isSelected =
+                      controller.currencyCode.value == currency['code'];
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? const Color(0xFFF7B500).withOpacity(0.1)
+                            : Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Center(
+                        child: Text(
+                          currency['symbol']!,
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: isSelected
+                                ? const Color(0xFFF7B500)
+                                : Colors.grey,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    title: Text(
+                      currency['code']!,
+                      style: TextStyle(
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                        color: const Color(0xFF333333),
+                      ),
+                    ),
+                    subtitle: Text(
+                      currency['name']!,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF666666),
+                      ),
+                    ),
+                    trailing: isSelected
+                        ? const Icon(
+                            Icons.check_circle,
+                            color: Color(0xFFF7B500),
+                          )
+                        : null,
+                    onTap: () {
+                      controller.changeCurrency(
+                        currency['code']!,
+                        currency['symbol']!,
+                      );
+                      Get.back();
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
     );
   }
 }

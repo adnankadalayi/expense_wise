@@ -9,4 +9,7 @@ class Settings {
   bool darkMode = false;
   bool dailyReminders = true;
   bool cloudBackup = true;
+
+  String currencyCode = 'USD';
+  String currencySymbol = '\$';
 }

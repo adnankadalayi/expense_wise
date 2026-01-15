@@ -147,8 +147,9 @@ class AddTransactionScreen extends StatelessWidget {
                                 firstDate: DateTime(2020),
                                 lastDate: DateTime(2030),
                               );
-                              if (date != null)
+                              if (date != null) {
                                 controller.selectedDate.value = date;
+                              }
                             },
                           ),
                         ],
@@ -306,7 +307,7 @@ class AddTransactionScreen extends StatelessWidget {
           // Keypad (Fixed at bottom)
           Container(
             color: const Color(0xFFF9F9F9),
-            padding: const EdgeInsets.only(bottom: 30, top: 10),
+            padding: const EdgeInsets.only(bottom: 10, top: 10),
             child: Column(
               children: [
                 _buildKeypadRow(controller, ['1', '2', '3']),
@@ -572,8 +573,9 @@ class AddTransactionScreen extends StatelessWidget {
     TransactionsController controller,
   ) {
     if (controller.selectedCategory.value == null ||
-        controller.selectedCategory.value!.subCategories == null)
+        controller.selectedCategory.value!.subCategories == null) {
       return;
+    }
 
     Get.bottomSheet(
       Container(

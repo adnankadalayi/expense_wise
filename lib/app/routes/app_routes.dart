@@ -10,6 +10,7 @@ abstract class Routes {
   static const EDIT_PROFILE = _Paths.EDIT_PROFILE;
   static const ACCOUNTS = _Paths.ACCOUNTS;
   static const ADD_ACCOUNT = _Paths.ADD_ACCOUNT;
+  static const CATEGORY_MANAGEMENT = _Paths.CATEGORY_MANAGEMENT;
 }
 
 abstract class _Paths {
@@ -22,4 +23,5 @@ abstract class _Paths {
   static const EDIT_PROFILE = '/edit-profile';
   static const ACCOUNTS = '/accounts';
   static const ADD_ACCOUNT = '/add-account';
+  static const CATEGORY_MANAGEMENT = '/category-management';
 }

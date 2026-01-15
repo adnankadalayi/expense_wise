@@ -1,7 +1,8 @@
 import 'package:expense_wise/app/modules/home/controllers/stats_screen_controller.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'dart:math';
+import 'package:intl/intl.dart';
 
 class StatsHeader extends StatelessWidget {
   const StatsHeader({super.key});
@@ -11,60 +12,96 @@ class StatsHeader extends StatelessWidget {
     final controller = Get.put(StatisticsController());
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
       child: SlideTransition(
         position: controller.headerSlideAnimation,
         child: FadeTransition(
           opacity: controller.headerFadeAnimation,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Statistics',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Analytics',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+                  ),
+                ],
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 0,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Obx(
-                  () => DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: controller.selectedPeriod.value,
-                      icon: const Icon(
-                        Icons.keyboard_arrow_down,
+              // const SizedBox(height: 5), // Same spacing as Categories
+
+              // Month Selector Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.calendar_today,
                         color: Colors.white,
                         size: 16,
                       ),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                      const SizedBox(width: 8),
+                      Obx(
+                        () => Text(
+                          DateFormat(
+                            'MMMM yyyy',
+                          ).format(controller.selectedDate.value),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
-                      dropdownColor: const Color(0xFF002E6E),
-                      items: controller.periods.map((String period) {
-                        return DropdownMenuItem<String>(
-                          value: period,
-                          child: Text(period),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        if (newValue != null) {
-                          controller.selectPeriod(newValue);
-                        }
-                      },
-                    ),
+                    ],
                   ),
-                ),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: controller.previousMonth,
+                        icon: const Icon(
+                          Icons.chevron_left,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        onPressed: controller.nextMonth,
+                        icon: const Icon(
+                          Icons.chevron_right,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        onPressed: () {}, // Filter action
+                        icon: const Icon(
+                          Icons.filter_list,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),
@@ -85,363 +122,385 @@ class StatsBody extends StatelessWidget {
       position: controller.contentSlideAnimation,
       child: FadeTransition(
         opacity: controller.contentFadeAnimation,
-        child: Container(
-          // No rounded corners here, main screen handles it for consistency or we keep top rounded
-          // Actually, the main screen will likely apply the clip or the container itself.
-          // The white card in MainScreen will have the border radius.
-          // So this child just needs to fill it.
-          // BUT, if I remove the decoration here, the background will be transparent?
-          // No, MainScreen's AnimatedContainer checks the white background.
-          // So this widget should just be the content.
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Spending Overview
-                _buildSpendingOverview(controller),
-                const SizedBox(height: 24),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Chart Section
+              _buildChartSection(controller),
 
-                // Chart
-                _buildChart(controller),
-                const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-                // Categories
-                _buildCategories(controller),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSpendingOverview(StatisticsController controller) {
-    return SlideTransition(
-      position: controller.overviewSlideAnimation,
-      child: FadeTransition(
-        opacity: controller.overviewFadeAnimation,
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: const Color(0xFF00BAF2).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Obx(
-            () => Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${controller.selectedPeriod.value} Overview',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF333333),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _StatItem(
-                      amount:
-                          '\$${controller.totalSpent.value.toStringAsFixed(0)}',
-                      label: 'Total Spent',
-                    ),
-                    _StatItem(
-                      amount:
-                          '\$${controller.totalIncome.value.toStringAsFixed(0)}',
-                      label: 'Total Income',
-                    ),
-                    _StatItem(
-                      amount:
-                          '\$${controller.netSavings.value.toStringAsFixed(0)}',
-                      label: 'Net Savings',
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildChart(StatisticsController controller) {
-    return SlideTransition(
-      position: controller.chartSlideAnimation,
-      child: FadeTransition(
-        opacity: controller.chartFadeAnimation,
-        child: Container(
-          height: 200,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8F9FA),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Center(
-            child: SizedBox(
-              width: 140,
-              height: 140,
-              child: Stack(
+              // Filter Pills (Visual only for now as per requirement)
+              Row(
                 children: [
-                  Obx(() {
-                    // Prepare segments for painter
-                    final List<Map<String, dynamic>> segments = [];
-                    double startAngle = 0.0;
-                    final total = controller.totalSpent.value > 0
-                        ? controller.totalSpent.value
-                        : 1.0;
-
-                    for (var cat in controller.categoryData) {
-                      final double rawPercentage = cat['rawPercentage'];
-                      final sweepAngle = (rawPercentage / 100) * 2 * pi;
-
-                      segments.add({
-                        'color': cat['color'],
-                        'startAngle': startAngle,
-                        'sweepAngle': sweepAngle,
-                      });
-
-                      startAngle += sweepAngle;
-                    }
-
-                    if (segments.isEmpty) {
-                      // Placeholder if no data
-                      segments.add({
-                        'color': Colors.grey.shade300,
-                        'startAngle': 0.0,
-                        'sweepAngle': 2 * pi,
-                      });
-                    }
-
-                    return CustomPaint(
-                      size: const Size(140, 140),
-                      painter: DonutChartPainter(segments: segments),
-                    );
-                  }),
-                  Center(
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Obx(
-                        () => Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '\$${controller.totalSpent.value.toStringAsFixed(0)}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF333333),
-                              ),
-                            ),
-                            const Text(
-                              'Total',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: Color(0xFF666666),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                  _buildPill('Income', false),
+                  const SizedBox(width: 12),
+                  _buildPill('Expenses', false), // Can make interactive later
+                  const SizedBox(width: 12),
+                  _buildPill('Total', true),
+                  const Spacer(),
+                  const Text(
+                    'Day',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
               ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
-  Widget _buildCategories(StatisticsController controller) {
-    return SlideTransition(
-      position: controller.categoriesSlideAnimation,
-      child: FadeTransition(
-        opacity: controller.categoriesFadeAnimation,
-        child: Obx(
-          () => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Categories',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF333333),
-                ),
-              ),
-              const SizedBox(height: 16),
-              ...controller.categoryData.asMap().entries.map((entry) {
-                int index = entry.key;
-                Map<String, dynamic> category = entry.value;
-                return TweenAnimationBuilder<double>(
-                  duration: Duration(milliseconds: 600 + (index * 100)),
-                  tween: Tween<double>(begin: 0.0, end: 1.0),
-                  curve: Curves.easeOut,
-                  builder: (context, value, child) {
-                    return Transform.translate(
-                      offset: Offset(30 * (1 - value), 0),
-                      child: Opacity(
-                        opacity: value,
-                        child: _CategoryItem(
-                          name: category['name'],
-                          percentage: category['percentage'],
-                          amount: category['amount'],
-                          color: category['color'],
-                          isLast: index == controller.categoryData.length - 1,
-                        ),
-                      ),
-                    );
-                  },
-                );
-              }),
+              const SizedBox(height: 24),
+
+              // Cash Flow Card
+              _buildCashFlowCard(controller),
+
+              const SizedBox(height: 24),
+
+              // Average Card
+              _buildAverageCard(controller),
+
+              const SizedBox(height: 80), // Bottom padding
             ],
           ),
         ),
       ),
     );
   }
-}
 
-class _StatItem extends StatelessWidget {
-  final String amount;
-  final String label;
-
-  const _StatItem({required this.amount, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          amount,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFFF7B500),
-          ),
+  Widget _buildPill(String text, bool isActive) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: isActive ? const Color(0xFF002E6E) : Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: isActive ? Colors.white : Colors.grey.shade700,
+          fontWeight: FontWeight.w600,
+          fontSize: 14,
         ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Color(0xFF666666),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
+      ),
     );
   }
-}
 
-class _CategoryItem extends StatelessWidget {
-  final String name;
-  final String percentage;
-  final String amount;
-  final Color color;
-  final bool isLast;
-
-  const _CategoryItem({
-    required this.name,
-    required this.percentage,
-    required this.amount,
-    required this.color,
-    this.isLast = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildChartSection(StatisticsController controller) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        border: isLast
-            ? null
-            : const Border(
-                bottom: BorderSide(color: Color(0xFFF5F5F5), width: 1),
+      height: 300,
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(0, 20, 20, 0),
+      // Keeping it clean/transparent or could add a background
+      child: Obx(
+        () => LineChart(
+          LineChartData(
+            gridData: FlGridData(show: false),
+            titlesData: FlTitlesData(
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) {
+                    if (value == 0) {
+                      return const Text(
+                        '0',
+                        style: TextStyle(color: Colors.grey, fontSize: 10),
+                      );
+                    }
+                    if (value >= 1000) {
+                      return Text(
+                        '${(value / 1000).toStringAsFixed(0)}k',
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 10,
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                  reservedSize: 30,
+                  interval: controller.maxY.value / 4,
+                ),
               ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 12,
-            height: 12,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF333333),
-                  ),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) {
+                    int day = value.toInt();
+                    // Show label every 5 days or so
+                    if (day % 5 == 0 && day > 0 && day <= 31) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          'Jan $day', // Ideally format using selectedDate month
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 10,
+                          ),
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                  interval: 1,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  percentage,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF666666),
-                  ),
-                ),
-              ],
+              ),
+              rightTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
             ),
+            borderData: FlBorderData(show: false),
+            minX: 1,
+            maxX: 31, // Standard month max
+            minY: 0,
+            maxY: controller.maxY.value,
+            lineTouchData: LineTouchData(
+              touchTooltipData: LineTouchTooltipData(
+                getTooltipColor: (_) => Colors.blueGrey.withOpacity(0.8),
+              ),
+            ),
+            lineBarsData: [
+              // Income Line (Green)
+              LineChartBarData(
+                spots: controller.incomeSpots,
+                isCurved: true,
+                color: Colors.green,
+                barWidth: 3,
+                isStrokeCapRound: true,
+                dotData: FlDotData(show: false),
+                belowBarData: BarAreaData(
+                  show: true,
+                  color: Colors.green.withOpacity(0.1),
+                ),
+              ),
+              // Expense Line (Red)
+              LineChartBarData(
+                spots: controller.expenseSpots,
+                isCurved: true,
+                color: Colors.red,
+                barWidth: 3,
+                isStrokeCapRound: true,
+                dotData: FlDotData(show: false),
+                belowBarData: BarAreaData(show: false),
+              ),
+            ],
           ),
-          Text(
-            amount,
-            style: const TextStyle(
-              fontSize: 14,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCashFlowCard(StatisticsController controller) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F9FA), // Light grey background
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Cash flow',
+            style: TextStyle(
+              fontSize: 18,
               fontWeight: FontWeight.w700,
               color: Color(0xFF333333),
             ),
+          ),
+          const SizedBox(height: 4),
+          Obx(
+            () => Text(
+              DateFormat('MMMM yyyy').format(controller.selectedDate.value),
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Income Row
+          _buildCashFlowRow(
+            icon: Icons.arrow_circle_up,
+            iconColor: Colors.green,
+            label: 'Income',
+            amount: controller.totalIncome,
+            amountColor: Colors.green,
+          ),
+          const SizedBox(height: 16),
+
+          // Expense Row
+          _buildCashFlowRow(
+            icon: Icons.arrow_circle_down,
+            iconColor: Colors.red,
+            label: 'Expenses',
+            amount: controller.totalSpent,
+            amountColor: Colors.red,
+          ),
+
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.0),
+            child: Divider(height: 1),
+          ),
+
+          // Total Row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const SizedBox(width: 40), // Spacer for alignment
+              const Text(
+                'Total:',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF333333),
+                ),
+              ),
+              Obx(() {
+                final val = controller.netSavings.value;
+                return Text(
+                  '${val >= 0 ? '+' : ''}\$${val.toStringAsFixed(0)}', // Using $ or user's currency
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: val >= 0 ? Colors.green : Colors.red,
+                  ),
+                );
+              }),
+            ],
           ),
         ],
       ),
     );
   }
-}
 
-class DonutChartPainter extends CustomPainter {
-  final List<Map<String, dynamic>> segments;
-
-  DonutChartPainter({required this.segments});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 30
-      ..strokeCap = StrokeCap.round;
-
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = (size.width - 30) / 2;
-
-    for (final segment in segments) {
-      paint.color = segment['color'] as Color;
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        segment['startAngle'] as double,
-        segment['sweepAngle'] as double,
-        false,
-        paint,
-      );
-    }
+  Widget _buildCashFlowRow({
+    required IconData icon,
+    required Color iconColor,
+    required String label,
+    required RxDouble amount,
+    required Color amountColor,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, color: iconColor, size: 28),
+        const SizedBox(width: 12),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF333333),
+          ),
+        ),
+        const Spacer(),
+        Obx(
+          () => Text(
+            '\$${amount.value.toStringAsFixed(0)}',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: amountColor,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  Widget _buildAverageCard(StatisticsController controller) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(
+          0xFF1E1E1E,
+        ), // Dark card for contrast like in design?
+        // Or keep light? The design used dark cards.
+        // Let's try DarkCard here for specific look or stick to light.
+        // User asked "in current theme". Current theme is mostly light.
+        // But "Like this" (image) shows dark cards.
+        // I will stick to Dark Card for "Average" to make it pop, or Light Card to be safe.
+        // Let's go with Dark Card to mimic the design structure more closely if "structure" implies the look.
+        // But the user said "current theme".
+        // I'll stick to Dark Background for this specific card to match the visual weight of the image's layout.
+        // color: const Color(0xFF2C2C2E),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Average',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Obx(
+            () => Text(
+              DateFormat('MMMM yyyy').format(controller.selectedDate.value),
+              style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Averages
+          _buildAverageRow('Day', controller.avgDayIncome, controller.avgDay),
+          const SizedBox(height: 12),
+          _buildAverageRow(
+            'Week',
+            controller.avgWeekIncome,
+            controller.avgWeek,
+          ),
+          const SizedBox(height: 12),
+          _buildAverageRow(
+            'Month',
+            controller.avgMonthIncome,
+            controller.avgMonth,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAverageRow(String label, RxDouble income, RxDouble expense) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        SizedBox(
+          width: 60,
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        Obx(
+          () => Text(
+            '\$${income.value.toStringAsFixed(2)}',
+            style: const TextStyle(
+              color: Colors.green,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Obx(
+          () => Text(
+            '\$${expense.value.toStringAsFixed(2)}',
+            style: const TextStyle(
+              color: Colors.redAccent, // Slightly lighter red for dark bg
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }

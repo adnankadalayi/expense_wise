@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:expense_wise/app/modules/accounts/controllers/accounts_controller.dart';
 import 'package:expense_wise/app/routes/app_pages.dart';
+import 'package:expense_wise/app/services/storage_service.dart';
 import 'package:intl/intl.dart';
 
 class AccountsView extends GetView<AccountsController> {
@@ -63,7 +64,9 @@ class AccountsView extends GetView<AccountsController> {
                                 ),
                                 trailing: Text(
                                   NumberFormat.currency(
-                                    symbol: '\$',
+                                    symbol: Get.find<StorageService>()
+                                        .currencySymbol
+                                        .value,
                                   ).format(account.balance),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
@@ -155,7 +158,7 @@ class AccountsView extends GetView<AccountsController> {
           const SizedBox(height: 8),
           Text(
             NumberFormat.currency(
-              symbol: '\$',
+              symbol: Get.find<StorageService>().currencySymbol.value,
             ).format(controller.totalBalance.value),
             style: const TextStyle(
               color: Colors.white,

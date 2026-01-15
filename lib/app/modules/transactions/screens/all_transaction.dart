@@ -1,5 +1,6 @@
 import 'package:expense_wise/app/data/models/transaction.dart';
 import 'package:expense_wise/app/modules/transactions/controllers/all_transaction_controller.dart';
+import 'package:expense_wise/app/services/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -286,8 +287,8 @@ class AllTransactionsScreen extends StatelessWidget {
                 ),
                 Text(
                   monthData['total'] >= 0
-                      ? '+\$${(monthData['total'] as double).toStringAsFixed(2)}'
-                      : '-\$${(monthData['total'] as double).abs().toStringAsFixed(2)}',
+                      ? '+${Get.find<StorageService>().currencySymbol.value}${(monthData['total'] as double).toStringAsFixed(2)}'
+                      : '-${Get.find<StorageService>().currencySymbol.value}${(monthData['total'] as double).abs().toStringAsFixed(2)}',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -421,8 +422,8 @@ class AllTransactionsScreen extends StatelessWidget {
                 // Amount
                 Text(
                   isExpense
-                      ? '-\$${transaction.amount.toStringAsFixed(2)}'
-                      : '+\$${transaction.amount.toStringAsFixed(2)}',
+                      ? '-${Get.find<StorageService>().currencySymbol.value}${transaction.amount.toStringAsFixed(2)}'
+                      : '+${Get.find<StorageService>().currencySymbol.value}${transaction.amount.toStringAsFixed(2)}',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,

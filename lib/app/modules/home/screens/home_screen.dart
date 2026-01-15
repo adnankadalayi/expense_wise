@@ -15,7 +15,7 @@ class HomeHeader extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
         child: SlideTransition(
-          position: controller.slideUpAnimation,
+          position: controller.slideDownAnimation,
           child: Container(
             width: double.infinity,
             padding: const EdgeInsets.all(24),
@@ -53,7 +53,7 @@ class HomeHeader extends StatelessWidget {
                           const SizedBox(height: 8),
                           Obx(
                             () => Text(
-                              '\$${controller.balance.value.toStringAsFixed(2)}',
+                              '${controller.currencySymbol.value}${controller.balance.value.toStringAsFixed(2)}',
                               style: const TextStyle(
                                 fontSize: 32,
                                 fontWeight: FontWeight.w800,
@@ -119,7 +119,7 @@ class HomeHeader extends StatelessWidget {
                       const SizedBox(width: 6),
                       Obx(
                         () => Text(
-                          '+\$${controller.weeklyChange.value.toStringAsFixed(2)} this week',
+                          '+${controller.currencySymbol.value}${controller.weeklyChange.value.toStringAsFixed(2)} this week',
                           style: const TextStyle(
                             fontSize: 12,
                             color: Color(0xFF22C55E),
@@ -284,7 +284,7 @@ class HomeBody extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '${isExpense ? '-' : '+'}\$${transaction.amount.toStringAsFixed(2)}',
+                          '${isExpense ? '-' : '+'}${controller.currencySymbol.value}${transaction.amount.toStringAsFixed(2)}',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,

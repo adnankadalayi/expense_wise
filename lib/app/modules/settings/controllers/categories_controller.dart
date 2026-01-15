@@ -9,6 +9,7 @@ class CategoriesController extends GetxController {
 
   var expenseCategories = <Category>[].obs;
   var incomeCategories = <Category>[].obs;
+  var selectedTabIndex = 0.obs;
 
   @override
   void onInit() {

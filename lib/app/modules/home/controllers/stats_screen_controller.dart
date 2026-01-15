@@ -1,5 +1,6 @@
 import 'package:expense_wise/app/data/models/transaction.dart';
 import 'package:expense_wise/app/services/storage_service.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:isar_community/isar.dart';
@@ -8,32 +9,36 @@ class StatisticsController extends GetxController
     with GetTickerProviderStateMixin {
   final StorageService _storageService = Get.find<StorageService>();
 
-  var selectedPeriod = 'This Month'.obs;
+  // Date Navigation
+  var selectedDate = DateTime.now().obs;
 
   // Real Data Observables
   var totalSpent = 0.0.obs;
   var totalIncome = 0.0.obs;
   var netSavings = 0.0.obs;
-  var categoryData = <Map<String, dynamic>>[].obs;
+
+  // Chart Data
+  var incomeSpots = <FlSpot>[].obs;
+  var expenseSpots = <FlSpot>[].obs;
+  var maxY = 100.0.obs; // To scale chart (default non-zero)
+
+  // Averages
+  var avgDay = 0.0.obs;
+  var avgWeek = 0.0.obs;
+  var avgMonth = 0.0.obs;
+
+  // Averages for Income
+  var avgDayIncome = 0.0.obs;
+  var avgWeekIncome = 0.0.obs;
+  var avgMonthIncome = 0.0.obs;
 
   late AnimationController headerAnimationController;
   late AnimationController contentAnimationController;
-  late AnimationController overviewAnimationController;
-  late AnimationController chartAnimationController;
-  late AnimationController categoriesAnimationController;
 
   late Animation<Offset> headerSlideAnimation;
   late Animation<double> headerFadeAnimation;
   late Animation<Offset> contentSlideAnimation;
   late Animation<double> contentFadeAnimation;
-  late Animation<Offset> overviewSlideAnimation;
-  late Animation<double> overviewFadeAnimation;
-  late Animation<Offset> chartSlideAnimation;
-  late Animation<double> chartFadeAnimation;
-  late Animation<Offset> categoriesSlideAnimation;
-  late Animation<double> categoriesFadeAnimation;
-
-  final List<String> periods = ['This Month', 'Last Month', 'This Year'];
 
   @override
   void onInit() {
@@ -42,86 +47,102 @@ class StatisticsController extends GetxController
     startAnimations();
     loadData();
 
-    // Listen to changes in period
-    ever(selectedPeriod, (_) => loadData());
+    // Listen to changes in date
+    ever(selectedDate, (_) => loadData());
+  }
+
+  void nextMonth() {
+    selectedDate.value = DateTime(
+      selectedDate.value.year,
+      selectedDate.value.month + 1,
+    );
+  }
+
+  void previousMonth() {
+    selectedDate.value = DateTime(
+      selectedDate.value.year,
+      selectedDate.value.month - 1,
+    );
   }
 
   void loadData() async {
-    final now = DateTime.now();
-    DateTime start;
-    DateTime end;
-
-    if (selectedPeriod.value == 'This Month') {
-      start = DateTime(now.year, now.month, 1);
-      end = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
-    } else if (selectedPeriod.value == 'Last Month') {
-      start = DateTime(now.year, now.month - 1, 1);
-      end = DateTime(now.year, now.month, 0, 23, 59, 59);
-    } else {
-      // This Year
-      start = DateTime(now.year, 1, 1);
-      end = DateTime(now.year, 12, 31, 23, 59, 59);
-    }
+    final now = selectedDate.value;
+    final start = DateTime(now.year, now.month, 1);
+    final end = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
 
     final transactions = await _storageService.db.transactions
         .filter()
         .dateBetween(start, end)
         .findAll();
 
-    // Calculate Overview
-    double expense = 0;
-    double income = 0;
+    double expenseSum = 0;
+    double incomeSum = 0;
 
-    // Calculate Category Breakdown
-    final catMap = <String, double>{};
-    final catColorMap = <String, Color>{};
+    // Daily Aggregation
+    final Map<int, double> dailyExpense = {};
+    final Map<int, double> dailyIncome = {};
+
+    int daysInMonth = end.day;
+    for (int i = 1; i <= daysInMonth; i++) {
+      dailyExpense[i] = 0.0;
+      dailyIncome[i] = 0.0;
+    }
 
     for (var tx in transactions) {
       if (tx.type == TransactionType.expense) {
-        expense += tx.amount;
-
-        await tx.category.load();
-        final catName = tx.category.value?.name ?? 'Other';
-        catMap[catName] = (catMap[catName] ?? 0) + tx.amount;
-
-        if (!catColorMap.containsKey(catName)) {
-          final hex = tx.category.value?.colorHex;
-          catColorMap[catName] = hex != null
-              ? Color(int.parse(hex))
-              : Colors.grey;
-        }
+        expenseSum += tx.amount;
+        dailyExpense[tx.date.day] =
+            (dailyExpense[tx.date.day] ?? 0) + tx.amount;
       } else if (tx.type == TransactionType.income) {
-        income += tx.amount;
+        incomeSum += tx.amount;
+        dailyIncome[tx.date.day] = (dailyIncome[tx.date.day] ?? 0) + tx.amount;
       }
     }
 
-    totalSpent.value = expense;
-    totalIncome.value = income;
-    netSavings.value = income - expense;
+    totalSpent.value = expenseSum;
+    totalIncome.value = incomeSum;
+    // netSavings.value = incomeSum - expenseSum; // Removed as per instruction
 
-    // Prepare Category Data List
-    final totalExp = expense > 0 ? expense : 1.0; // avoid div by zero
-    final List<Map<String, dynamic>> newData = [];
+    // Prepare Chart Spots
+    final List<FlSpot> eSpots = [];
+    final List<FlSpot> iSpots = [];
+    double currentMaxY = 0;
 
-    catMap.forEach((name, amount) {
-      final percentage = (amount / totalExp * 100);
-      newData.add({
-        'name': name,
-        'percentage': '${percentage.toStringAsFixed(0)}% of spending',
-        'amount': '\$${amount.toStringAsFixed(0)}',
-        'color': catColorMap[name] ?? Colors.grey,
-        'rawPercentage': percentage, // for sorting or chart angles
-      });
+    dailyExpense.forEach((day, amount) {
+      eSpots.add(FlSpot(day.toDouble(), amount));
+      if (amount > currentMaxY) currentMaxY = amount;
+    });
+    dailyIncome.forEach((day, amount) {
+      iSpots.add(FlSpot(day.toDouble(), amount));
+      if (amount > currentMaxY) currentMaxY = amount;
     });
 
-    // Sort by amount descending
-    newData.sort(
-      (a, b) => (b['rawPercentage'] as double).compareTo(
-        a['rawPercentage'] as double,
-      ),
-    );
+    // Sort sorted by key/day above, but good to be safe
+    eSpots.sort((a, b) => a.x.compareTo(b.x));
+    iSpots.sort((a, b) => a.x.compareTo(b.x));
 
-    categoryData.assignAll(newData);
+    expenseSpots.assignAll(eSpots);
+    incomeSpots.assignAll(iSpots);
+
+    // Ensure maxY is at least somewhat reasonable to avoid flat line issues or 0 division
+    if (currentMaxY == 0) currentMaxY = 100;
+    maxY.value = currentMaxY * 1.2;
+
+    // Calculate Averages
+    int divisorDay = daysInMonth;
+    // If viewing current month, use days passed so far
+    if (now.year == DateTime.now().year && now.month == DateTime.now().month) {
+      divisorDay = DateTime.now().day;
+      if (divisorDay == 0) divisorDay = 1;
+    }
+
+    avgDay.value = expenseSum / divisorDay;
+    avgWeek.value = avgDay.value * 7;
+    avgMonth.value = expenseSum;
+
+    avgDayIncome.value = incomeSum / divisorDay;
+    avgWeekIncome.value = avgDayIncome.value * 7;
+    avgMonthIncome.value = incomeSum;
   }
 
   void setupAnimations() {
@@ -131,21 +152,6 @@ class StatisticsController extends GetxController
     );
 
     contentAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-
-    overviewAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-
-    chartAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-
-    categoriesAnimationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
@@ -175,45 +181,6 @@ class StatisticsController extends GetxController
       begin: 0.0,
       end: 1.0,
     ).animate(contentAnimationController);
-
-    overviewSlideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: overviewAnimationController,
-            curve: Curves.easeOut,
-          ),
-        );
-
-    overviewFadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(overviewAnimationController);
-
-    chartSlideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: chartAnimationController,
-            curve: Curves.easeOut,
-          ),
-        );
-
-    chartFadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(chartAnimationController);
-
-    categoriesSlideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: categoriesAnimationController,
-            curve: Curves.easeOut,
-          ),
-        );
-
-    categoriesFadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(categoriesAnimationController);
   }
 
   void startAnimations() {
@@ -221,28 +188,12 @@ class StatisticsController extends GetxController
     Future.delayed(const Duration(milliseconds: 400), () {
       contentAnimationController.forward();
     });
-    Future.delayed(const Duration(milliseconds: 600), () {
-      overviewAnimationController.forward();
-    });
-    Future.delayed(const Duration(milliseconds: 800), () {
-      chartAnimationController.forward();
-    });
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      categoriesAnimationController.forward();
-    });
-  }
-
-  void selectPeriod(String period) {
-    selectedPeriod.value = period;
   }
 
   @override
   void onClose() {
     headerAnimationController.dispose();
     contentAnimationController.dispose();
-    overviewAnimationController.dispose();
-    chartAnimationController.dispose();
-    categoriesAnimationController.dispose();
     super.onClose();
   }
 }

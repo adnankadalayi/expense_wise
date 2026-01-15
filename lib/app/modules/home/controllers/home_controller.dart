@@ -13,13 +13,15 @@ class HomeController extends GetxController with SingleGetTickerProviderMixin {
   final transactions = <Transaction>[].obs;
   final homeAccounts = <Account>[].obs;
 
+  RxString get currencySymbol => _storageService.currencySymbol;
+
   var selectedNavIndex = 0.obs;
 
   // Top offsets for the white card based on tab index
   final Map<int, double> cardTopOffsets = {
     0: 240.0, // Home: Below Balance Card
-    1: 100.0, // Stats: Below Title/Dropdown
-    2: 100.0, // Budgets: Below Title
+    1: 120.0, // Stats: Below Title/Dropdown
+    2: 120.0, // Budgets/Categories: Below Title + Month Selector
     3: 220.0, // Settings: Below Profile
   };
 
@@ -28,6 +30,7 @@ class HomeController extends GetxController with SingleGetTickerProviderMixin {
   late AnimationController animationController;
   late Animation<double> fadeInLeftAnimation;
   late Animation<Offset> slideUpAnimation;
+  late Animation<Offset> slideDownAnimation;
   late Animation<double> fadeInRightAnimation;
 
   @override
@@ -50,6 +53,14 @@ class HomeController extends GetxController with SingleGetTickerProviderMixin {
           CurvedAnimation(
             parent: animationController,
             curve: const Interval(0.4, 0.8, curve: Curves.easeOut),
+          ),
+        );
+
+    slideDownAnimation =
+        Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: animationController,
+            curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
           ),
         );
 

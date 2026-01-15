@@ -2,11 +2,10 @@ import 'package:expense_wise/app/modules/home/controllers/home_controller.dart';
 import 'package:expense_wise/app/modules/home/screens/add_transaction.dart';
 import 'package:expense_wise/app/modules/home/screens/home_screen.dart';
 import 'package:expense_wise/app/modules/home/screens/stat_screen.dart';
+import 'package:expense_wise/app/modules/home/screens/categories_screen.dart';
 import 'package:expense_wise/app/modules/home/screens/settings_screen.dart';
-import 'package:expense_wise/app/modules/budgets/views/budgets_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'dart:ui';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -49,7 +48,7 @@ class MainScreen extends StatelessWidget {
                   children: const [
                     HomeHeader(),
                     StatsHeader(),
-                    BudgetsHeader(),
+                    CategoriesHeader(),
                     SettingsHeader(),
                   ],
                 ),
@@ -86,7 +85,7 @@ class MainScreen extends StatelessWidget {
                   children: const [
                     HomeBody(),
                     StatsBody(),
-                    BudgetsBody(),
+                    CategoriesBody(),
                     SettingsBody(),
                   ],
                 ),
@@ -165,8 +164,8 @@ class BottomNavBar extends StatelessWidget {
             ),
             Obx(
               () => _buildNavItem(
-                icon: Icons.account_balance_wallet_rounded,
-                label: 'Budgets',
+                icon: Icons.grid_view_rounded,
+                label: 'Categories',
                 isSelected: controller.selectedNavIndex.value == 2,
                 onTap: () => controller.selectedNavIndex.value = 2,
               ),
