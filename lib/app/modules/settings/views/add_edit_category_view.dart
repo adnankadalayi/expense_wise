@@ -1,5 +1,6 @@
 import 'package:expense_wise/app/data/models/category.dart';
-import 'package:expense_wise/app/modules/settings/controllers/categories_controller.dart';
+import 'package:expense_wise/app/modules/settings/controllers/settings_categories_controller.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,7 +19,7 @@ class _AddEditCategoryViewState extends State<AddEditCategoryView> {
   late CategoryType _selectedType;
   late String _selectedColor;
   late int _selectedIcon;
-  final List<String> _subCategories = [];
+  final List<SubCategory> _subCategories = [];
   final TextEditingController _subCatController = TextEditingController();
 
   final List<String> _colors = [
@@ -45,26 +46,82 @@ class _AddEditCategoryViewState extends State<AddEditCategoryView> {
   ];
 
   final List<int> _icons = [
-    Icons.shopping_cart.codePoint,
-    Icons.restaurant.codePoint,
-    Icons.directions_car.codePoint,
-    Icons.home.codePoint,
-    Icons.local_hospital.codePoint,
-    Icons.school.codePoint,
-    Icons.movie.codePoint,
-    Icons.flight.codePoint,
-    Icons.pets.codePoint,
-    Icons.work.codePoint,
-    Icons.build.codePoint,
-    Icons.card_giftcard.codePoint,
-    Icons.sports_esports.codePoint,
-    Icons.fitness_center.codePoint,
-    Icons.local_cafe.codePoint,
-    Icons.local_grocery_store.codePoint,
-    Icons.attach_money.codePoint,
-    Icons.account_balance.codePoint,
-    Icons.trending_up.codePoint,
-    Icons.category.codePoint,
+    // Essentials
+    CupertinoIcons.house_fill.codePoint,
+    CupertinoIcons.cart_fill.codePoint,
+    CupertinoIcons.bag_fill.codePoint,
+    CupertinoIcons.money_dollar.codePoint,
+    CupertinoIcons.creditcard_fill.codePoint,
+
+    // Transport
+    CupertinoIcons.car_detailed.codePoint,
+    CupertinoIcons.bus.codePoint,
+    CupertinoIcons.airplane.codePoint,
+    CupertinoIcons.train_style_one.codePoint, // Metro/Train?
+    CupertinoIcons.location_fill.codePoint,
+
+    // Food & Drink
+    CupertinoIcons.drop_fill.codePoint, // Water/Drinks
+    CupertinoIcons.ticket_fill.codePoint, // Entertainment/Restaurant
+    CupertinoIcons.gift_fill.codePoint,
+
+    // Health & Fitness
+    CupertinoIcons.heart_fill.codePoint,
+    CupertinoIcons.bandage_fill.codePoint,
+    CupertinoIcons.sportscourt_fill.codePoint,
+    CupertinoIcons.timer_fill.codePoint,
+    CupertinoIcons.person_crop_circle_fill.codePoint,
+
+    // Entertainment
+    CupertinoIcons.film.codePoint,
+    CupertinoIcons.game_controller_solid.codePoint,
+    CupertinoIcons.music_note_2.codePoint,
+    CupertinoIcons.tv_fill.codePoint,
+    CupertinoIcons.headphones.codePoint,
+    CupertinoIcons.camera_fill.codePoint,
+    CupertinoIcons.photo_fill.codePoint,
+
+    // Utilities & Bills
+    CupertinoIcons.lightbulb_fill.codePoint,
+    CupertinoIcons.phone_fill.codePoint,
+    CupertinoIcons.wifi.codePoint,
+    CupertinoIcons.doc_text_fill.codePoint, // Bills
+    CupertinoIcons.chart_bar_fill.codePoint,
+
+    // Education & Work
+    CupertinoIcons.book_fill.codePoint,
+    CupertinoIcons.briefcase_fill.codePoint,
+    CupertinoIcons.pencil.codePoint,
+    CupertinoIcons.desktopcomputer.codePoint,
+    CupertinoIcons.printer_fill.codePoint,
+
+    // Personal & Care
+    CupertinoIcons.scissors.codePoint, // Barber/Salon
+    CupertinoIcons.star_fill.codePoint,
+    CupertinoIcons.moon_fill.codePoint,
+    CupertinoIcons.sun_max_fill.codePoint,
+    CupertinoIcons.paw_solid.codePoint,
+
+    // Home & Maintenance
+    CupertinoIcons.hammer_fill.codePoint,
+    CupertinoIcons.wrench_fill.codePoint,
+    CupertinoIcons.trash_fill.codePoint,
+    CupertinoIcons.archivebox_fill.codePoint,
+    CupertinoIcons.cube_box_fill.codePoint,
+
+    // Tech
+    CupertinoIcons.device_phone_portrait.codePoint,
+    CupertinoIcons.device_laptop.codePoint,
+    CupertinoIcons.battery_100.codePoint,
+    CupertinoIcons.cloud_fill.codePoint,
+    CupertinoIcons.lock_fill.codePoint,
+
+    // Misc
+    CupertinoIcons.circle_grid_3x3_fill.codePoint,
+    CupertinoIcons.square_grid_2x2_fill.codePoint,
+    CupertinoIcons.tag_fill.codePoint,
+    CupertinoIcons.flag_fill.codePoint,
+    CupertinoIcons.map_fill.codePoint,
   ];
 
   @override
@@ -93,7 +150,7 @@ class _AddEditCategoryViewState extends State<AddEditCategoryView> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(CupertinoIcons.back),
           onPressed: () => Get.back(),
         ),
         actions: [
@@ -211,7 +268,10 @@ class _AddEditCategoryViewState extends State<AddEditCategoryView> {
                             : null,
                       ),
                       child: isSelected
-                          ? const Icon(Icons.check, color: Colors.white)
+                          ? const Icon(
+                              CupertinoIcons.check_mark,
+                              color: Colors.white,
+                            )
                           : null,
                     ),
                   );
@@ -242,7 +302,11 @@ class _AddEditCategoryViewState extends State<AddEditCategoryView> {
                             : null,
                       ),
                       child: Icon(
-                        IconData(codePoint, fontFamily: 'MaterialIcons'),
+                        IconData(
+                          codePoint,
+                          fontFamily: 'CupertinoIcons',
+                          fontPackage: 'cupertino_icons',
+                        ),
                         color: isSelected
                             ? Color(int.parse(_selectedColor))
                             : Colors.grey,
@@ -274,7 +338,10 @@ class _AddEditCategoryViewState extends State<AddEditCategoryView> {
                   const SizedBox(width: 8),
                   IconButton(
                     onPressed: _addSubCategory,
-                    icon: const Icon(Icons.add_circle, size: 32),
+                    icon: const Icon(
+                      CupertinoIcons.add_circled_solid,
+                      size: 32,
+                    ),
                     color: Color(int.parse(_selectedColor)),
                   ),
                 ],
@@ -300,18 +367,40 @@ class _AddEditCategoryViewState extends State<AddEditCategoryView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          _subCategories[index],
+                          _subCategories[index].name,
                           style: const TextStyle(fontSize: 16),
                         ),
-                        InkWell(
-                          onTap: () => setState(() {
-                            _subCategories.removeAt(index);
-                          }),
-                          child: const Icon(
-                            Icons.delete_outline,
-                            color: Colors.red,
-                            size: 20,
-                          ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (_subCategories[index].iconCodePoint != null)
+                              Icon(
+                                IconData(
+                                  _subCategories[index].iconCodePoint!,
+                                  fontFamily: 'CupertinoIcons',
+                                  fontPackage: 'cupertino_icons',
+                                ),
+                                size: 16,
+                                color: _subCategories[index].colorHex != null
+                                    ? Color(
+                                        int.parse(
+                                          _subCategories[index].colorHex!,
+                                        ),
+                                      )
+                                    : Colors.grey,
+                              ),
+                            const SizedBox(width: 8),
+                            InkWell(
+                              onTap: () => setState(() {
+                                _subCategories.removeAt(index);
+                              }),
+                              child: const Icon(
+                                CupertinoIcons.delete,
+                                color: Colors.red,
+                                size: 20,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -341,16 +430,140 @@ class _AddEditCategoryViewState extends State<AddEditCategoryView> {
 
   void _addSubCategory() {
     if (_subCatController.text.trim().isNotEmpty) {
-      setState(() {
-        _subCategories.add(_subCatController.text.trim());
-        _subCatController.clear();
-      });
+      _showSubCategoryDialog();
     }
+  }
+
+  void _showSubCategoryDialog() {
+    String? selectedColor = _selectedColor;
+    int? selectedIcon = _selectedIcon;
+
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Add Subcategory'),
+        content: StatefulBuilder(
+          builder: (context, setDialogState) {
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Name: ${_subCatController.text}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Color',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _colors.map((color) {
+                      final isSelected = selectedColor == color;
+                      return GestureDetector(
+                        onTap: () =>
+                            setDialogState(() => selectedColor = color),
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Color(int.parse(color)),
+                            shape: BoxShape.circle,
+                            border: isSelected
+                                ? Border.all(color: Colors.black, width: 2)
+                                : null,
+                          ),
+                          child: isSelected
+                              ? const Icon(
+                                  CupertinoIcons.check_mark,
+                                  color: Colors.white,
+                                  size: 16,
+                                )
+                              : null,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Icon',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _icons.take(20).map((codePoint) {
+                      final isSelected = selectedIcon == codePoint;
+                      return GestureDetector(
+                        onTap: () =>
+                            setDialogState(() => selectedIcon = codePoint),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Color(
+                                    int.parse(selectedColor!),
+                                  ).withOpacity(0.2)
+                                : Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                            border: isSelected
+                                ? Border.all(
+                                    color: Color(int.parse(selectedColor!)),
+                                  )
+                                : null,
+                          ),
+                          child: Icon(
+                            IconData(
+                              codePoint,
+                              fontFamily: 'CupertinoIcons',
+                              fontPackage: 'cupertino_icons',
+                            ),
+                            size: 20,
+                            color: isSelected
+                                ? Color(int.parse(selectedColor!))
+                                : Colors.grey,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () {
+              final subCat = SubCategory()
+                ..name = _subCatController.text.trim()
+                ..colorHex = selectedColor
+                ..iconCodePoint = selectedIcon;
+              setState(() {
+                _subCategories.add(subCat);
+                _subCatController.clear();
+              });
+              Get.back();
+            },
+            child: const Text('Add'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _saveCategory() {
     if (_formKey.currentState!.validate()) {
-      final controller = Get.find<CategoriesController>();
+      final controller = Get.find<SettingsCategoriesController>();
 
       if (widget.category == null) {
         controller.addCategory(

@@ -1,5 +1,6 @@
 import 'package:expense_wise/app/modules/home/controllers/stats_screen_controller.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -33,7 +34,11 @@ class StatsHeader extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () {},
-                    icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+                    icon: const Icon(
+                      CupertinoIcons.pencil,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ),
                 ],
               ),
@@ -46,7 +51,7 @@ class StatsHeader extends StatelessWidget {
                   Row(
                     children: [
                       const Icon(
-                        Icons.calendar_today,
+                        CupertinoIcons.calendar,
                         color: Colors.white,
                         size: 16,
                       ),
@@ -70,7 +75,7 @@ class StatsHeader extends StatelessWidget {
                       IconButton(
                         onPressed: controller.previousMonth,
                         icon: const Icon(
-                          Icons.chevron_left,
+                          CupertinoIcons.left_chevron,
                           color: Colors.white,
                           size: 24,
                         ),
@@ -81,7 +86,7 @@ class StatsHeader extends StatelessWidget {
                       IconButton(
                         onPressed: controller.nextMonth,
                         icon: const Icon(
-                          Icons.chevron_right,
+                          CupertinoIcons.right_chevron,
                           color: Colors.white,
                           size: 24,
                         ),
@@ -92,7 +97,7 @@ class StatsHeader extends StatelessWidget {
                       IconButton(
                         onPressed: () {}, // Filter action
                         icon: const Icon(
-                          Icons.filter_list,
+                          CupertinoIcons.slider_horizontal_3,
                           color: Colors.white,
                           size: 24,
                         ),
@@ -321,7 +326,7 @@ class StatsBody extends StatelessWidget {
 
           // Income Row
           _buildCashFlowRow(
-            icon: Icons.arrow_circle_up,
+            icon: CupertinoIcons.arrow_up_circle_fill,
             iconColor: Colors.green,
             label: 'Income',
             amount: controller.totalIncome,
@@ -331,7 +336,7 @@ class StatsBody extends StatelessWidget {
 
           // Expense Row
           _buildCashFlowRow(
-            icon: Icons.arrow_circle_down,
+            icon: CupertinoIcons.arrow_down_circle_fill,
             iconColor: Colors.red,
             label: 'Expenses',
             amount: controller.totalSpent,

@@ -2,6 +2,13 @@ import 'package:isar_community/isar.dart';
 
 part 'category.g.dart';
 
+@embedded
+class SubCategory {
+  late String name;
+  int? iconCodePoint;
+  String? colorHex;
+}
+
 @collection
 class Category {
   Id id = Isar.autoIncrement;
@@ -17,7 +24,7 @@ class Category {
 
   bool isCustom = false;
 
-  List<String>? subCategories;
+  List<SubCategory>? subCategories;
 }
 
 enum CategoryType { expense, income }

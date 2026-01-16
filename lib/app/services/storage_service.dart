@@ -7,7 +7,7 @@ import 'package:expense_wise/app/data/models/account.dart';
 import 'package:expense_wise/app/data/models/budget.dart';
 import 'package:expense_wise/app/data/models/category.dart';
 import 'package:expense_wise/app/data/models/transaction.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 class StorageService extends GetxService {
   late Isar db;
@@ -26,6 +26,7 @@ class StorageService extends GetxService {
       SettingsSchema,
     ], directory: dir.path);
     await _seedDefaultCategories();
+    await _fixExistingCategoryIcons();
     await _ensureSettings();
     await _processRecurringTransactions();
     return this;
@@ -113,43 +114,43 @@ class StorageService extends GetxService {
       final defaultCategories = [
         Category()
           ..name = 'Food'
-          ..iconCodePoint = Icons.fastfood.codePoint
+          ..iconCodePoint = CupertinoIcons.cart_fill.codePoint
           ..colorHex =
               '0xFFFF5722' // Deep Orange
           ..type = CategoryType.expense,
         Category()
           ..name = 'Transport'
-          ..iconCodePoint = Icons.directions_bus.codePoint
+          ..iconCodePoint = CupertinoIcons.car_detailed.codePoint
           ..colorHex =
               '0xFF2196F3' // Blue
           ..type = CategoryType.expense,
         Category()
           ..name = 'Shopping'
-          ..iconCodePoint = Icons.shopping_bag.codePoint
+          ..iconCodePoint = CupertinoIcons.bag_fill.codePoint
           ..colorHex =
               '0xFFE91E63' // Pink
           ..type = CategoryType.expense,
         Category()
           ..name = 'Entertainment'
-          ..iconCodePoint = Icons.movie.codePoint
+          ..iconCodePoint = CupertinoIcons.film.codePoint
           ..colorHex =
               '0xFF9C27B0' // Purple
           ..type = CategoryType.expense,
         Category()
           ..name = 'Health'
-          ..iconCodePoint = Icons.local_hospital.codePoint
+          ..iconCodePoint = CupertinoIcons.heart_fill.codePoint
           ..colorHex =
               '0xFFF44336' // Red
           ..type = CategoryType.expense,
         Category()
           ..name = 'Salary'
-          ..iconCodePoint = Icons.attach_money.codePoint
+          ..iconCodePoint = CupertinoIcons.money_dollar.codePoint
           ..colorHex =
               '0xFF4CAF50' // Green
           ..type = CategoryType.income,
         Category()
           ..name = 'Gift'
-          ..iconCodePoint = Icons.card_giftcard.codePoint
+          ..iconCodePoint = CupertinoIcons.gift_fill.codePoint
           ..colorHex =
               '0xFFFFC107' // Amber
           ..type = CategoryType.income,
@@ -159,6 +160,40 @@ class StorageService extends GetxService {
         await db.categorys.putAll(defaultCategories);
       });
     }
+  }
+
+  Future<void> _fixExistingCategoryIcons() async {
+    // defaults map: Name -> desired Cupertino Icon CodePoint
+    final updates = {
+      'Food': CupertinoIcons.cart_fill.codePoint,
+      'Transport': CupertinoIcons.car_detailed.codePoint,
+      'Shopping': CupertinoIcons.bag_fill.codePoint,
+      'Entertainment': CupertinoIcons.film.codePoint,
+      'Health': CupertinoIcons.heart_fill.codePoint,
+      'Salary': CupertinoIcons.money_dollar.codePoint,
+      'Gift': CupertinoIcons.gift_fill.codePoint,
+    };
+
+    final categoriesToUpdate = await db.categorys
+        .filter()
+        .anyOf(updates.keys, (q, name) => q.nameEqualTo(name))
+        .findAll();
+
+    if (categoriesToUpdate.isEmpty) return;
+
+    await db.writeTxn(() async {
+      for (var cat in categoriesToUpdate) {
+        if (updates.containsKey(cat.name)) {
+          // Only update if it's different to avoid unnecessary writes
+          // (though writeTxn is already open)
+          final newCodePoint = updates[cat.name]!;
+          if (cat.iconCodePoint != newCodePoint) {
+            cat.iconCodePoint = newCodePoint;
+            await db.categorys.put(cat);
+          }
+        }
+      }
+    });
   }
 
   Future<void> _ensureSettings() async {

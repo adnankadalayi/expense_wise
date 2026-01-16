@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:expense_wise/app/modules/transactions/controllers/transactions_controller.dart';
@@ -17,7 +18,7 @@ class AddTransactionScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(CupertinoIcons.back, color: Colors.black),
           onPressed: () => Get.back(),
         ),
         actions: [
@@ -64,7 +65,7 @@ class AddTransactionScreen extends StatelessWidget {
                               label: controller.descriptionText.value.isNotEmpty
                                   ? 'Note Added'
                                   : 'Add Note',
-                              icon: Icons.edit,
+                              icon: CupertinoIcons.pencil,
                               onTap: () => _showNoteDialog(context, controller),
                             ),
                             if (!controller.isTransfer.value)
@@ -74,7 +75,7 @@ class AddTransactionScreen extends StatelessWidget {
                                 label:
                                     controller.selectedCategory.value?.name ??
                                     'Category',
-                                icon: Icons.category,
+                                icon: CupertinoIcons.tag,
                                 onTap: () =>
                                     _showCategorySheet(context, controller),
                               ),
@@ -96,7 +97,7 @@ class AddTransactionScreen extends StatelessWidget {
                                 label:
                                     controller.selectedSubCategory.value ??
                                     'Subcategory',
-                                icon: Icons.subdirectory_arrow_right,
+                                icon: CupertinoIcons.arrow_turn_down_right,
                                 onTap: () =>
                                     _showSubCategorySheet(context, controller),
                               ),
@@ -119,7 +120,7 @@ class AddTransactionScreen extends StatelessWidget {
                             label: controller.isTransfer.value
                                 ? 'From Account'
                                 : 'Account',
-                            icon: Icons.account_balance_wallet,
+                            icon: CupertinoIcons.creditcard,
                             onTap: () =>
                                 _showAccountSheet(context, controller, false),
                           ),
@@ -129,7 +130,7 @@ class AddTransactionScreen extends StatelessWidget {
                               context,
                               controller,
                               label: 'To Account',
-                              icon: Icons.arrow_forward_ios,
+                              icon: CupertinoIcons.right_chevron,
                               onTap: () =>
                                   _showAccountSheet(context, controller, true),
                             ),
@@ -139,7 +140,7 @@ class AddTransactionScreen extends StatelessWidget {
                             context,
                             controller,
                             label: 'Date',
-                            icon: Icons.calendar_today,
+                            icon: CupertinoIcons.calendar,
                             onTap: () async {
                               final date = await showDatePicker(
                                 context: context,
@@ -394,7 +395,7 @@ class AddTransactionScreen extends StatelessWidget {
         ),
         child: key == 'backspace'
             ? const Icon(
-                Icons.backspace_outlined,
+                CupertinoIcons.delete_left,
                 size: 24,
                 color: Colors.black,
               )
@@ -490,7 +491,8 @@ class AddTransactionScreen extends StatelessWidget {
                             child: Icon(
                               IconData(
                                 cat.iconCodePoint!,
-                                fontFamily: 'MaterialIcons',
+                                fontFamily: 'CupertinoIcons',
+                                fontPackage: 'cupertino_icons',
                               ),
                               color: cat.colorHex != null
                                   ? Color(int.parse(cat.colorHex!))
@@ -547,7 +549,7 @@ class AddTransactionScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final acc = controller.accounts[index];
                     return ListTile(
-                      leading: const Icon(Icons.account_balance_wallet),
+                      leading: const Icon(CupertinoIcons.creditcard),
                       title: Text(acc.name),
                       onTap: () {
                         if (isDestination) {
@@ -601,13 +603,29 @@ class AddTransactionScreen extends StatelessWidget {
                   final subCat =
                       controller.selectedCategory.value!.subCategories![index];
                   return ListTile(
-                    title: Text(subCat),
+                    leading: subCat.iconCodePoint != null
+                        ? Icon(
+                            IconData(
+                              subCat.iconCodePoint!,
+                              fontFamily: 'CupertinoIcons',
+                              fontPackage: 'cupertino_icons',
+                            ),
+                            color: subCat.colorHex != null
+                                ? Color(int.parse(subCat.colorHex!))
+                                : Colors.grey,
+                          )
+                        : null,
+                    title: Text(subCat.name),
                     onTap: () {
-                      controller.selectedSubCategory.value = subCat;
+                      controller.selectedSubCategory.value = subCat.name;
                       Get.back();
                     },
-                    trailing: controller.selectedSubCategory.value == subCat
-                        ? const Icon(Icons.check, color: Color(0xFF00BAF2))
+                    trailing:
+                        controller.selectedSubCategory.value == subCat.name
+                        ? const Icon(
+                            CupertinoIcons.check_mark,
+                            color: Color(0xFF00BAF2),
+                          )
                         : null,
                   );
                 },

@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:intl/intl.dart';
 import 'package:expense_wise/app/modules/home/controllers/categories_controller.dart';
 import 'package:expense_wise/app/routes/app_pages.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -373,23 +374,23 @@ class _CategoryItem extends StatelessWidget {
   IconData _getIconForCategory(String name) {
     switch (name.toLowerCase()) {
       case 'bills':
-        return Icons.receipt_long;
+        return CupertinoIcons.doc_text;
       case 'debt':
-        return Icons.money_off;
+        return CupertinoIcons.money_dollar_circle;
       case 'food & drinks':
-        return Icons.restaurant;
+        return CupertinoIcons.ticket_fill;
       case 'transport':
-        return Icons.directions_bus;
+        return CupertinoIcons.bus;
       case 'shopping':
-        return Icons.shopping_bag;
+        return CupertinoIcons.bag_fill;
       case 'vehicle':
-        return Icons.directions_car;
+        return CupertinoIcons.car_detailed;
       case 'entertainment':
-        return Icons.movie;
+        return CupertinoIcons.film;
       case 'scram': // From screenshot
-        return Icons.two_wheeler;
+        return CupertinoIcons.tortoise;
       default:
-        return Icons.category;
+        return CupertinoIcons.square_grid_2x2_fill;
     }
   }
 }

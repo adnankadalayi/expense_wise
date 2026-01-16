@@ -1,5 +1,6 @@
 import 'package:expense_wise/app/data/models/category.dart';
 import 'package:expense_wise/app/modules/budgets/controllers/budgets_controller.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,7 +19,7 @@ class AddBudgetView extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black),
+          icon: const Icon(CupertinoIcons.xmark, color: Colors.black),
           onPressed: () => Get.back(),
         ),
       ),
@@ -66,7 +67,8 @@ class AddBudgetView extends StatelessWidget {
                                 child: Icon(
                                   IconData(
                                     category.iconCodePoint!,
-                                    fontFamily: 'MaterialIcons',
+                                    fontFamily: 'CupertinoIcons',
+                                    fontPackage: 'cupertino_icons',
                                   ),
                                   size: 18,
                                   color: isSelected

@@ -22,7 +22,7 @@ class HomeController extends GetxController with SingleGetTickerProviderMixin {
     0: 240.0, // Home: Below Balance Card
     1: 120.0, // Stats: Below Title/Dropdown
     2: 120.0, // Budgets/Categories: Below Title + Month Selector
-    3: 220.0, // Settings: Below Profile
+    3: 190.0, // Settings: Below Profile
   };
 
   double get currentCardTop => cardTopOffsets[selectedNavIndex.value] ?? 280.0;

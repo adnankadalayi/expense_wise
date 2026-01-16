@@ -1,6 +1,7 @@
 import 'package:expense_wise/app/modules/budgets/controllers/budgets_controller.dart';
 import 'package:expense_wise/app/modules/budgets/views/add_budget_view.dart';
 import 'package:expense_wise/app/services/storage_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -36,7 +37,11 @@ class BudgetsHeader extends StatelessWidget {
                 color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.add, color: Colors.white, size: 24),
+              child: const Icon(
+                CupertinoIcons.add,
+                color: Colors.white,
+                size: 24,
+              ),
             ),
           ),
         ],
@@ -60,7 +65,7 @@ class BudgetsBody extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(
-                  Icons.account_balance_wallet,
+                  CupertinoIcons.creditcard,
                   size: 64,
                   color: Colors.grey,
                 ),
@@ -95,9 +100,10 @@ class BudgetsBody extends StatelessWidget {
             final catIcon = category?.iconCodePoint != null
                 ? IconData(
                     category!.iconCodePoint!,
-                    fontFamily: 'MaterialIcons',
+                    fontFamily: 'CupertinoIcons',
+                    fontPackage: 'cupertino_icons',
                   )
-                : Icons.category;
+                : CupertinoIcons.square_grid_2x2;
 
             final progress = (spent / budget.amount).clamp(0.0, 1.0);
             final remaining = budget.amount - spent;
@@ -152,7 +158,7 @@ class BudgetsBody extends StatelessWidget {
                         ),
                         IconButton(
                           icon: const Icon(
-                            Icons.delete_outline,
+                            CupertinoIcons.delete,
                             size: 20,
                             color: Colors.grey,
                           ),

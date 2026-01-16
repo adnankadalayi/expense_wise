@@ -1,5 +1,6 @@
 import 'package:expense_wise/app/modules/home/controllers/home_controller.dart';
 import 'package:expense_wise/app/data/models/transaction.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -79,7 +80,7 @@ class HomeHeader extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              Icons.account_balance_wallet_outlined,
+                              CupertinoIcons.creditcard,
                               size: 16,
                               color: Color(0xFF00BAF2),
                             ),
@@ -112,7 +113,7 @@ class HomeHeader extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(
-                        Icons.trending_up,
+                        CupertinoIcons.graph_square,
                         size: 14,
                         color: Color(0xFF22C55E),
                       ),
@@ -163,7 +164,7 @@ class HomeBody extends StatelessWidget {
                 ),
               ),
               GestureDetector(
-                onTap: () => Get.toNamed('/all'),
+                onTap: () => Get.toNamed('/transactions'),
                 child: const Text(
                   'See All',
                   style: TextStyle(
@@ -185,7 +186,7 @@ class HomeBody extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.receipt_long_outlined,
+                      CupertinoIcons.doc_text,
                       size: 64,
                       color: Colors.grey.shade300,
                     ),
@@ -245,8 +246,11 @@ class HomeBody extends StatelessWidget {
                             child: Icon(
                               IconData(
                                 category?.iconCodePoint ??
-                                    Icons.category.codePoint,
-                                fontFamily: 'MaterialIcons',
+                                    CupertinoIcons
+                                        .square_grid_2x2_fill
+                                        .codePoint,
+                                fontFamily: 'CupertinoIcons',
+                                fontPackage: 'cupertino_icons',
                               ),
                               size: 20,
                               color: category?.colorHex != null

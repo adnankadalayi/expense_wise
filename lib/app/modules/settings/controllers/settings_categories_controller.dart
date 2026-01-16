@@ -4,7 +4,7 @@ import 'package:expense_wise/app/services/storage_service.dart';
 import 'package:get/get.dart';
 import 'package:isar_community/isar.dart';
 
-class CategoriesController extends GetxController {
+class SettingsCategoriesController extends GetxController {
   final StorageService _storageService = Get.find<StorageService>();
 
   var expenseCategories = <Category>[].obs;
@@ -44,7 +44,12 @@ class CategoriesController extends GetxController {
         ..colorHex =
             '0xFFFF9800' // Orange
         ..iconCodePoint = Icons.restaurant.codePoint
-        ..subCategories = ['Groceries', 'Restaurants', 'Snacks', 'Coffee']
+        ..subCategories = [
+          SubCategory()..name = 'Groceries',
+          SubCategory()..name = 'Restaurants',
+          SubCategory()..name = 'Snacks',
+          SubCategory()..name = 'Coffee',
+        ]
         ..isCustom = false,
       Category()
         ..name = 'Transportation'
@@ -52,7 +57,12 @@ class CategoriesController extends GetxController {
         ..colorHex =
             '0xFF2196F3' // Blue
         ..iconCodePoint = Icons.directions_car.codePoint
-        ..subCategories = ['Fuel', 'Public Transport', 'Maintenance', 'Parking']
+        ..subCategories = [
+          SubCategory()..name = 'Fuel',
+          SubCategory()..name = 'Public Transport',
+          SubCategory()..name = 'Maintenance',
+          SubCategory()..name = 'Parking',
+        ]
         ..isCustom = false,
       Category()
         ..name = 'Housing'
@@ -60,7 +70,12 @@ class CategoriesController extends GetxController {
         ..colorHex =
             '0xFF795548' // Brown
         ..iconCodePoint = Icons.home.codePoint
-        ..subCategories = ['Rent', 'Utilities', 'Internet', 'Maintenance']
+        ..subCategories = [
+          SubCategory()..name = 'Rent',
+          SubCategory()..name = 'Utilities',
+          SubCategory()..name = 'Internet',
+          SubCategory()..name = 'Maintenance',
+        ]
         ..isCustom = false,
       Category()
         ..name = 'Entertainment'
@@ -68,7 +83,12 @@ class CategoriesController extends GetxController {
         ..colorHex =
             '0xFF9C27B0' // Purple
         ..iconCodePoint = Icons.movie.codePoint
-        ..subCategories = ['Movies', 'Games', 'Subscriptions', 'Hobbies']
+        ..subCategories = [
+          SubCategory()..name = 'Movies',
+          SubCategory()..name = 'Games',
+          SubCategory()..name = 'Subscriptions',
+          SubCategory()..name = 'Hobbies',
+        ]
         ..isCustom = false,
       Category()
         ..name = 'Health'
@@ -76,7 +96,12 @@ class CategoriesController extends GetxController {
         ..colorHex =
             '0xFFF44336' // Red
         ..iconCodePoint = Icons.local_hospital.codePoint
-        ..subCategories = ['Doctor', 'Pharmacy', 'Fitness', 'Insurance']
+        ..subCategories = [
+          SubCategory()..name = 'Doctor',
+          SubCategory()..name = 'Pharmacy',
+          SubCategory()..name = 'Fitness',
+          SubCategory()..name = 'Insurance',
+        ]
         ..isCustom = false,
       Category()
         ..name = 'Shopping'
@@ -84,7 +109,11 @@ class CategoriesController extends GetxController {
         ..colorHex =
             '0xFFE91E63' // Pink
         ..iconCodePoint = Icons.shopping_bag.codePoint
-        ..subCategories = ['Clothing', 'Electronics', 'Home & Garden']
+        ..subCategories = [
+          SubCategory()..name = 'Clothing',
+          SubCategory()..name = 'Electronics',
+          SubCategory()..name = 'Home & Garden',
+        ]
         ..isCustom = false,
 
       // Income Categories
@@ -94,7 +123,11 @@ class CategoriesController extends GetxController {
         ..colorHex =
             '0xFF4CAF50' // Green
         ..iconCodePoint = Icons.attach_money.codePoint
-        ..subCategories = ['Full-time', 'Bonus', 'Commission']
+        ..subCategories = [
+          SubCategory()..name = 'Full-time',
+          SubCategory()..name = 'Bonus',
+          SubCategory()..name = 'Commission',
+        ]
         ..isCustom = false,
       Category()
         ..name = 'Freelance'
@@ -102,7 +135,10 @@ class CategoriesController extends GetxController {
         ..colorHex =
             '0xFF009688' // Teal
         ..iconCodePoint = Icons.computer.codePoint
-        ..subCategories = ['Projects', 'Consulting']
+        ..subCategories = [
+          SubCategory()..name = 'Projects',
+          SubCategory()..name = 'Consulting',
+        ]
         ..isCustom = false,
       Category()
         ..name = 'Investments'
@@ -110,7 +146,11 @@ class CategoriesController extends GetxController {
         ..colorHex =
             '0xFF3F51B5' // Indigo
         ..iconCodePoint = Icons.trending_up.codePoint
-        ..subCategories = ['Dividends', 'Interest', 'Crypto']
+        ..subCategories = [
+          SubCategory()..name = 'Dividends',
+          SubCategory()..name = 'Interest',
+          SubCategory()..name = 'Crypto',
+        ]
         ..isCustom = false,
     ];
 
@@ -124,7 +164,7 @@ class CategoriesController extends GetxController {
     required CategoryType type,
     required String colorHex,
     required int iconCodePoint,
-    List<String> subCategories = const [],
+    List<SubCategory> subCategories = const [],
   }) async {
     final newCategory = Category()
       ..name = name
@@ -145,7 +185,7 @@ class CategoriesController extends GetxController {
     String? name,
     String? colorHex,
     int? iconCodePoint,
-    List<String>? subCategories,
+    List<SubCategory>? subCategories,
   }) async {
     await _storageService.db.writeTxn(() async {
       if (name != null) category.name = name;

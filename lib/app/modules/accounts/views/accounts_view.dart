@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:expense_wise/app/modules/accounts/controllers/accounts_controller.dart';
@@ -11,162 +12,385 @@ class AccountsView extends GetView<AccountsController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Accounts'), centerTitle: true),
-      body: Obx(() {
-        return Column(
-          children: [
-            _buildTotalBalanceCard(context),
-            const SizedBox(height: 20),
-            Expanded(
-              child: controller.accounts.isEmpty
-                  ? Center(
-                      child: Text(
-                        'No accounts added yet',
-                        style: Theme.of(context).textTheme.bodyLarge,
+      backgroundColor: const Color(0xFF002E6E),
+      extendBodyBehindAppBar: true,
+      body: Stack(
+        children: [
+          // Gradient Background
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF002E6E), Color(0xFF00BAF2)],
+              ),
+            ),
+          ),
+
+          // Main Content
+          Column(
+            children: [
+              // Custom Header
+              SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Title Row
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              CupertinoIcons.back,
+                              color: Colors.white,
+                            ),
+                            onPressed: () => Get.back(),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                          const SizedBox(width: 12),
+                          const Text(
+                            'Accounts',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
                       ),
-                    )
-                  : ListView.builder(
+                      const SizedBox(height: 16),
+
+                      // Total Balance Card
+                      _buildTotalBalanceCard(context),
+                    ],
+                  ),
+                ),
+              ),
+
+              // White Card Container
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(32),
+                    ),
+                  ),
+                  child: Obx(() {
+                    if (controller.accounts.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                CupertinoIcons.creditcard,
+                                size: 48,
+                                color: Colors.grey[400],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No accounts yet',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Tap + to create your first account',
+                              style: TextStyle(
+                                color: Colors.grey[400],
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    return ListView.separated(
+                      padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
                       itemCount: controller.accounts.length,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 10),
                       itemBuilder: (context, index) {
                         final account = controller.accounts[index];
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                        return Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.04),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: Column(
                             children: [
-                              ListTile(
-                                leading: CircleAvatar(
-                                  backgroundColor: account.colorHex != null
-                                      ? Color(int.parse(account.colorHex!))
-                                      : Theme.of(context).primaryColor,
-                                  child: Icon(
-                                    account.iconCodePoint != null
-                                        ? IconData(
-                                            account.iconCodePoint!,
-                                            fontFamily: 'MaterialIcons',
-                                          )
-                                        : Icons.account_balance_wallet,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                title: Text(
-                                  account.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                subtitle: Text(
-                                  account.type.name.capitalizeFirst ?? '',
-                                ),
-                                trailing: Text(
-                                  NumberFormat.currency(
-                                    symbol: Get.find<StorageService>()
-                                        .currencySymbol
-                                        .value,
-                                  ).format(account.balance),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                              const Divider(),
+                              // Account Info Row
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  // Toggle Show on Home
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0,
+                                  // Icon Container with Gradient
+                                  Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      gradient: account.colorHex != null
+                                          ? LinearGradient(
+                                              colors: [
+                                                Color(
+                                                  int.parse(account.colorHex!),
+                                                ).withOpacity(0.15),
+                                                Color(
+                                                  int.parse(account.colorHex!),
+                                                ).withOpacity(0.25),
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            )
+                                          : LinearGradient(
+                                              colors: [
+                                                Colors.grey[200]!,
+                                                Colors.grey[300]!,
+                                              ],
+                                            ),
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
-                                    child: Row(
+                                    child: Icon(
+                                      account.iconCodePoint != null
+                                          ? IconData(
+                                              account.iconCodePoint!,
+                                              fontFamily: 'CupertinoIcons',
+                                              fontPackage: 'cupertino_icons',
+                                            )
+                                          : CupertinoIcons.creditcard,
+                                      color: account.colorHex != null
+                                          ? Color(int.parse(account.colorHex!))
+                                          : Colors.grey[600],
+                                      size: 24,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+
+                                  // Account Name & Type
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        const Text(
-                                          'Show on Home',
-                                          style: TextStyle(fontSize: 12),
+                                        Text(
+                                          account.name,
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF1A1A1A),
+                                            letterSpacing: -0.2,
+                                          ),
                                         ),
-                                        Checkbox(
-                                          value: account.showOnHome,
-                                          onChanged: (val) => controller
-                                              .toggleShowOnHome(account),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          account.type.name.capitalizeFirst ??
+                                              '',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[500],
+                                            fontWeight: FontWeight.w400,
+                                          ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  // Toggle Include in Total
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        const Text(
-                                          'Include in Total',
-                                          style: TextStyle(fontSize: 12),
-                                        ),
-                                        Checkbox(
-                                          value: !account.excludeFromTotal,
-                                          onChanged: (val) => controller
-                                              .toggleExcludeFromTotal(account),
-                                        ),
-                                      ],
+
+                                  // Balance
+                                  Text(
+                                    NumberFormat.currency(
+                                      symbol: Get.find<StorageService>()
+                                          .currencySymbol
+                                          .value,
+                                    ).format(account.balance),
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: account.balance >= 0
+                                          ? const Color(0xFF002E6E)
+                                          : Colors.red,
                                     ),
                                   ),
                                 ],
+                              ),
+
+                              // Toggles Row
+                              Padding(
+                                padding: const EdgeInsets.only(top: 12),
+                                child: Row(
+                                  children: [
+                                    // Show on Home Toggle
+                                    Expanded(
+                                      child: _buildToggleChip(
+                                        label: 'Show on Home',
+                                        value: account.showOnHome,
+                                        onChanged: () => controller
+                                            .toggleShowOnHome(account),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    // Include in Total Toggle
+                                    Expanded(
+                                      child: _buildToggleChip(
+                                        label: 'Include in Total',
+                                        value: !account.excludeFromTotal,
+                                        onChanged: () => controller
+                                            .toggleExcludeFromTotal(account),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                         );
                       },
-                    ),
+                    );
+                  }),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF00BAF2).withOpacity(0.4),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
-        );
-      }),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.toNamed(Routes.ADD_ACCOUNT),
-        child: const Icon(Icons.add),
+        ),
+        child: FloatingActionButton(
+          onPressed: () => Get.toNamed(Routes.ADD_ACCOUNT),
+          backgroundColor: const Color(0xFF00BAF2),
+          elevation: 0,
+          child: const Icon(CupertinoIcons.add, color: Colors.white, size: 28),
+        ),
       ),
     );
   }
 
   Widget _buildTotalBalanceCard(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
       ),
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
-            'Total Balance',
-            style: TextStyle(color: Colors.white70, fontSize: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Total Balance',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.8),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Obx(
+                () => Text(
+                  NumberFormat.currency(
+                    symbol: Get.find<StorageService>().currencySymbol.value,
+                  ).format(controller.totalBalance.value),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            NumberFormat.currency(
-              symbol: Get.find<StorageService>().currencySymbol.value,
-            ).format(controller.totalBalance.value),
-            style: const TextStyle(
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              CupertinoIcons.money_dollar_circle_fill,
               color: Colors.white,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
+              size: 28,
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildToggleChip({
+    required String label,
+    required bool value,
+    required VoidCallback onChanged,
+  }) {
+    return GestureDetector(
+      onTap: onChanged,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: value
+              ? const Color(0xFF00BAF2).withOpacity(0.1)
+              : Colors.grey[100],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: value ? const Color(0xFF00BAF2) : Colors.grey[300]!,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              value
+                  ? CupertinoIcons.check_mark_circled_solid
+                  : CupertinoIcons.circle,
+              size: 16,
+              color: value ? const Color(0xFF00BAF2) : Colors.grey[400],
+            ),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: value ? FontWeight.w600 : FontWeight.w500,
+                  color: value ? const Color(0xFF002E6E) : Colors.grey[600],
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

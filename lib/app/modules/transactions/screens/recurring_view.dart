@@ -1,5 +1,6 @@
 import 'package:expense_wise/app/data/models/recurring_transaction.dart';
 import 'package:expense_wise/app/services/storage_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -74,8 +75,10 @@ class RecurringTransactionsView extends StatelessWidget {
                   ),
                   child: Icon(
                     IconData(
-                      cat?.iconCodePoint ?? Icons.question_mark.codePoint,
-                      fontFamily: 'MaterialIcons',
+                      cat?.iconCodePoint ??
+                          CupertinoIcons.question_circle.codePoint,
+                      fontFamily: 'CupertinoIcons',
+                      fontPackage: 'cupertino_icons',
                     ),
                     color: color,
                   ),
@@ -95,7 +98,10 @@ class RecurringTransactionsView extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete_outline, color: Colors.red),
+                      icon: const Icon(
+                        CupertinoIcons.delete,
+                        color: Colors.red,
+                      ),
                       onPressed: () =>
                           controller.deleteRecurringTransaction(tx),
                     ),

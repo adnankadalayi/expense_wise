@@ -6,8 +6,8 @@ class SplashController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Auto-redirect after 4 seconds
-    Timer(const Duration(seconds: 4), () {
+    // Auto-redirect after 2 seconds
+    Timer(const Duration(seconds: 2), () {
       Get.offNamed(Routes.HOME);
     });
   }
