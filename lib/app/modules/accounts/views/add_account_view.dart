@@ -282,7 +282,7 @@ class AddAccountView extends GetView<AccountsController> {
           ),
         ),
         DropdownButtonFormField<AccountType>(
-          value: value,
+          initialValue: value,
           items: items,
           onChanged: onChanged,
           icon: const Icon(

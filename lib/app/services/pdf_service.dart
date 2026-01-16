@@ -3,6 +3,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:expense_wise/app/data/models/account.dart';
 import 'package:expense_wise/app/data/models/transaction.dart';
+import 'package:expense_wise/app/data/models/report_data.dart';
 import 'package:intl/intl.dart';
 
 class PdfService {
@@ -52,7 +53,7 @@ class PdfService {
               style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
             ),
             pw.SizedBox(height: 10),
-            pw.Table.fromTextArray(
+            pw.TableHelper.fromTextArray(
               headers: ['Account', 'Type', 'Balance'],
               data: accounts.map((a) {
                 return [
@@ -72,7 +73,7 @@ class PdfService {
               style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
             ),
             pw.SizedBox(height: 10),
-            pw.Table.fromTextArray(
+            pw.TableHelper.fromTextArray(
               headers: ['Date', 'Category', 'Description', 'Amount'],
               data: transactions.take(100).map((t) {
                 final isExpense = t.type == TransactionType.expense;
@@ -106,6 +107,270 @@ class PdfService {
     await Printing.sharePdf(
       bytes: await pdf.save(),
       filename: 'expense_wise_report_${DateFormat('yyyyMMdd').format(now)}.pdf',
+    );
+  }
+
+  /// Generate detailed report with category breakdown and trends
+  Future<void> generateDetailedReport({
+    required DateTime startDate,
+    required DateTime endDate,
+    required ReportData reportData,
+  }) async {
+    final pdf = pw.Document();
+    final now = DateTime.now();
+    final dateFormat = DateFormat('MMM d, yyyy');
+    final currencySymbol = '\$'; // TODO: Get from settings
+
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(32),
+        build: (context) {
+          return [
+            // Header
+            pw.Header(
+              level: 0,
+              child: pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text(
+                        'Financial Report',
+                        style: pw.TextStyle(
+                          fontSize: 24,
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColors.blue900,
+                        ),
+                      ),
+                      pw.SizedBox(height: 4),
+                      pw.Text(
+                        '${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}',
+                        style: const pw.TextStyle(
+                          fontSize: 12,
+                          color: PdfColors.grey700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  pw.Text(
+                    'Generated: ${dateFormat.format(now)}',
+                    style: const pw.TextStyle(
+                      fontSize: 10,
+                      color: PdfColors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            pw.SizedBox(height: 30),
+
+            // Summary Section
+            pw.Text(
+              'Summary',
+              style: pw.TextStyle(
+                fontSize: 18,
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColors.blue900,
+              ),
+            ),
+            pw.SizedBox(height: 10),
+            pw.Container(
+              padding: const pw.EdgeInsets.all(16),
+              decoration: pw.BoxDecoration(
+                border: pw.Border.all(color: PdfColors.grey300),
+                borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
+              ),
+              child: pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
+                children: [
+                  _buildSummaryItem(
+                    'Total Income',
+                    '$currencySymbol${reportData.totalIncome.toStringAsFixed(2)}',
+                    PdfColors.green,
+                  ),
+                  _buildSummaryItem(
+                    'Total Expense',
+                    '$currencySymbol${reportData.totalExpense.toStringAsFixed(2)}',
+                    PdfColors.red,
+                  ),
+                  _buildSummaryItem(
+                    'Net Amount',
+                    '$currencySymbol${reportData.netAmount.toStringAsFixed(2)}',
+                    reportData.netAmount >= 0 ? PdfColors.green : PdfColors.red,
+                  ),
+                ],
+              ),
+            ),
+            pw.SizedBox(height: 20),
+
+            // Statistics
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
+              children: [
+                _buildStatItem(
+                  'Savings Rate',
+                  '${reportData.savingsRate.toStringAsFixed(1)}%',
+                ),
+                _buildStatItem(
+                  'Avg Daily Spending',
+                  '$currencySymbol${reportData.averageDailySpending.toStringAsFixed(2)}',
+                ),
+              ],
+            ),
+            pw.SizedBox(height: 30),
+
+            // Category Breakdown
+            ...reportData.categoryBreakdown.isNotEmpty
+                ? [
+                    pw.Text(
+                      'Category Breakdown',
+                      style: pw.TextStyle(
+                        fontSize: 18,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColors.blue900,
+                      ),
+                    ),
+                    pw.SizedBox(height: 10),
+                    pw.TableHelper.fromTextArray(
+                      headers: [
+                        'Category',
+                        'Amount',
+                        'Transactions',
+                        'Percentage',
+                      ],
+                      data: reportData.categoryBreakdown.values.toList().map((
+                        cat,
+                      ) {
+                        return [
+                          cat.categoryName,
+                          '$currencySymbol${cat.amount.toStringAsFixed(2)}',
+                          cat.transactionCount.toString(),
+                          '${cat.percentage.toStringAsFixed(1)}%',
+                        ];
+                      }).toList(),
+                      headerStyle: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColors.white,
+                      ),
+                      headerDecoration: const pw.BoxDecoration(
+                        color: PdfColors.blue900,
+                      ),
+                      cellAlignment: pw.Alignment.centerLeft,
+                      cellAlignments: {
+                        1: pw.Alignment.centerRight,
+                        2: pw.Alignment.center,
+                        3: pw.Alignment.centerRight,
+                      },
+                    ),
+                    pw.SizedBox(height: 30),
+                  ]
+                : [],
+
+            // Monthly Trends
+            ...reportData.monthlyTrends.isNotEmpty
+                ? [
+                    pw.Text(
+                      'Monthly Trends',
+                      style: pw.TextStyle(
+                        fontSize: 18,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColors.blue900,
+                      ),
+                    ),
+                    pw.SizedBox(height: 10),
+                    pw.TableHelper.fromTextArray(
+                      headers: ['Month', 'Income', 'Expense', 'Net'],
+                      data: reportData.monthlyTrends.map((month) {
+                        return [
+                          '${month.monthName} ${month.year}',
+                          '$currencySymbol${month.income.toStringAsFixed(2)}',
+                          '$currencySymbol${month.expense.toStringAsFixed(2)}',
+                          '$currencySymbol${month.net.toStringAsFixed(2)}',
+                        ];
+                      }).toList(),
+                      headerStyle: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColors.white,
+                      ),
+                      headerDecoration: const pw.BoxDecoration(
+                        color: PdfColors.blue900,
+                      ),
+                      cellAlignment: pw.Alignment.centerLeft,
+                      cellAlignments: {
+                        1: pw.Alignment.centerRight,
+                        2: pw.Alignment.centerRight,
+                        3: pw.Alignment.centerRight,
+                      },
+                    ),
+                  ]
+                : [],
+
+            // Footer
+            pw.SizedBox(height: 40),
+            pw.Divider(color: PdfColors.grey300),
+            pw.SizedBox(height: 10),
+            pw.Text(
+              'Generated by ExpenseWise',
+              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey),
+            ),
+          ];
+        },
+      ),
+    );
+
+    await Printing.sharePdf(
+      bytes: await pdf.save(),
+      filename:
+          'expense_wise_report_${DateFormat('yyyyMMdd').format(startDate)}_${DateFormat('yyyyMMdd').format(endDate)}.pdf',
+    );
+  }
+
+  pw.Widget _buildSummaryItem(String label, String value, PdfColor color) {
+    return pw.Column(
+      children: [
+        pw.Text(
+          label,
+          style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+        ),
+        pw.SizedBox(height: 4),
+        pw.Text(
+          value,
+          style: pw.TextStyle(
+            fontSize: 16,
+            fontWeight: pw.FontWeight.bold,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+
+  pw.Widget _buildStatItem(String label, String value) {
+    return pw.Container(
+      padding: const pw.EdgeInsets.all(12),
+      decoration: pw.BoxDecoration(
+        color: PdfColors.grey100,
+        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
+      ),
+      child: pw.Column(
+        children: [
+          pw.Text(
+            label,
+            style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+          ),
+          pw.SizedBox(height: 4),
+          pw.Text(
+            value,
+            style: pw.TextStyle(
+              fontSize: 14,
+              fontWeight: pw.FontWeight.bold,
+              color: PdfColors.blue900,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

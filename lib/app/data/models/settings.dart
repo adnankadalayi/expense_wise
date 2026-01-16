@@ -12,4 +12,10 @@ class Settings {
 
   String currencyCode = 'USD';
   String currencySymbol = '\$';
+
+  // FIRE Settings
+  int? fireCurrentAge;
+  int? fireTargetAge;
+  double? fireReturnRate;
+  double? fireWithdrawalRate;
 }

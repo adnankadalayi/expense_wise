@@ -89,7 +89,10 @@ class BudgetsBody extends StatelessWidget {
           itemCount: controller.budgets.length,
           itemBuilder: (context, index) {
             final budget = controller.budgets[index];
-            final spent = controller.budgetProgress[budget.id] ?? 0.0;
+            final spendingData = controller.budgetSpending[budget.id];
+            final spent = spendingData?['spending'] ?? 0.0;
+            final isExceeded = spendingData?['isExceeded'] ?? false;
+            final isInWarning = spendingData?['isInWarning'] ?? false;
             final category = budget.category.value;
 
             // Safe access
@@ -107,13 +110,17 @@ class BudgetsBody extends StatelessWidget {
 
             final progress = (spent / budget.amount).clamp(0.0, 1.0);
             final remaining = budget.amount - spent;
-            final isOverBudget = spent > budget.amount;
 
             return Card(
               elevation: 4,
               shadowColor: Colors.black12,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
+                side: isExceeded
+                    ? const BorderSide(color: Colors.red, width: 2)
+                    : isInWarning
+                    ? BorderSide(color: Colors.orange.shade400, width: 2)
+                    : BorderSide.none,
               ),
               margin: const EdgeInsets.only(bottom: 16),
               child: Padding(
@@ -135,22 +142,48 @@ class BudgetsBody extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                catName,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
+                              Row(
+                                children: [
+                                  Text(
+                                    catName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  if (isExceeded) ...[
+                                    const SizedBox(width: 8),
+                                    const Icon(
+                                      CupertinoIcons
+                                          .exclamationmark_triangle_fill,
+                                      color: Colors.red,
+                                      size: 16,
+                                    ),
+                                  ] else if (isInWarning) ...[
+                                    const SizedBox(width: 8),
+                                    Icon(
+                                      CupertinoIcons
+                                          .exclamationmark_circle_fill,
+                                      color: Colors.orange.shade400,
+                                      size: 16,
+                                    ),
+                                  ],
+                                ],
                               ),
                               Text(
-                                isOverBudget
+                                isExceeded
                                     ? 'Over budget by ${Get.find<StorageService>().currencySymbol.value}${(spent - budget.amount).toStringAsFixed(0)}'
                                     : '${Get.find<StorageService>().currencySymbol.value}${remaining.toStringAsFixed(0)} left',
                                 style: TextStyle(
-                                  color: isOverBudget
+                                  color: isExceeded
                                       ? Colors.red
+                                      : isInWarning
+                                      ? Colors.orange.shade700
                                       : Colors.grey,
                                   fontSize: 12,
+                                  fontWeight: isExceeded || isInWarning
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
                                 ),
                               ),
                             ],
@@ -176,7 +209,11 @@ class BudgetsBody extends StatelessWidget {
                             Text(
                               '${Get.find<StorageService>().currencySymbol.value}${spent.toStringAsFixed(0)} spent',
                               style: TextStyle(
-                                color: catColor,
+                                color: isExceeded
+                                    ? Colors.red
+                                    : isInWarning
+                                    ? Colors.orange.shade700
+                                    : catColor,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -193,7 +230,11 @@ class BudgetsBody extends StatelessWidget {
                             value: progress,
                             backgroundColor: Colors.grey.shade100,
                             valueColor: AlwaysStoppedAnimation(
-                              isOverBudget ? Colors.red : catColor,
+                              isExceeded
+                                  ? Colors.red
+                                  : isInWarning
+                                  ? Colors.orange.shade400
+                                  : catColor,
                             ),
                             minHeight: 8,
                           ),

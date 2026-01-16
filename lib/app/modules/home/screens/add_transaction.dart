@@ -27,254 +27,237 @@ class AddTransactionScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
+          // Transaction Type Selector (Compact Horizontal Tabs)
+          Container(
+            margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Obx(
+              () => Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () =>
+                          controller.toggleType(TransactionType.income),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          color:
+                              !controller.isExpense.value &&
+                                  !controller.isTransfer.value
+                              ? Colors.green
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'Income',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color:
+                                !controller.isExpense.value &&
+                                    !controller.isTransfer.value
+                                ? Colors.white
+                                : Colors.black54,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () =>
+                          controller.toggleType(TransactionType.expense),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          color:
+                              controller.isExpense.value &&
+                                  !controller.isTransfer.value
+                              ? Colors.redAccent
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'Expense',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color:
+                                controller.isExpense.value &&
+                                    !controller.isTransfer.value
+                                ? Colors.white
+                                : Colors.black54,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () =>
+                          controller.toggleType(TransactionType.transfer),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          color: controller.isTransfer.value
+                              ? Colors.blueAccent
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'Transfer',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: controller.isTransfer.value
+                                ? Colors.white
+                                : Colors.black54,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
           // Content Area (Scrollable to prevent overflow)
           Expanded(
-            child: Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(height: 24),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 16),
 
-                    // Amount Display
-                    Obx(
-                      () => Text(
-                        '\$${controller.amountText.value}',
-                        style: const TextStyle(
-                          fontSize: 64,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
+                  // Amount Display
+                  Obx(
+                    () => Text(
+                      '\$${controller.amountText.value}',
+                      style: const TextStyle(
+                        fontSize: 56,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: 32),
+                  const SizedBox(height: 20),
 
-                    // Options Row 1
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                      child: Obx(
-                        () => Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 12,
-                          runSpacing: 12,
-                          children: [
-                            _buildOptionChip(
-                              context,
-                              controller,
-                              label: controller.descriptionText.value.isNotEmpty
-                                  ? 'Note Added'
-                                  : 'Add Note',
-                              icon: CupertinoIcons.pencil,
-                              onTap: () => _showNoteDialog(context, controller),
-                            ),
-                            if (!controller.isTransfer.value)
-                              _buildOptionChip(
-                                context,
-                                controller,
-                                label:
-                                    controller.selectedCategory.value?.name ??
-                                    'Category',
-                                icon: CupertinoIcons.tag,
-                                onTap: () =>
-                                    _showCategorySheet(context, controller),
-                              ),
-                            if (controller.selectedCategory.value != null &&
-                                controller
-                                        .selectedCategory
-                                        .value!
-                                        .subCategories !=
-                                    null &&
-                                controller
-                                    .selectedCategory
-                                    .value!
-                                    .subCategories!
-                                    .isNotEmpty &&
-                                !controller.isTransfer.value)
-                              _buildOptionChip(
-                                context,
-                                controller,
-                                label:
-                                    controller.selectedSubCategory.value ??
-                                    'Subcategory',
-                                icon: CupertinoIcons.arrow_turn_down_right,
-                                onTap: () =>
-                                    _showSubCategorySheet(context, controller),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // Options Row 2
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                  // Options Row 1
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Obx(
+                      () => Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 8,
+                        runSpacing: 8,
                         children: [
                           _buildOptionChip(
                             context,
                             controller,
-                            label: controller.isTransfer.value
-                                ? 'From Account'
-                                : 'Account',
-                            icon: CupertinoIcons.creditcard,
-                            onTap: () =>
-                                _showAccountSheet(context, controller, false),
+                            label: controller.descriptionText.value.isNotEmpty
+                                ? 'Note Added'
+                                : 'Add Note',
+                            icon: CupertinoIcons.pencil,
+                            onTap: () => _showNoteDialog(context, controller),
                           ),
-                          if (controller.isTransfer.value) ...[
-                            const SizedBox(width: 12),
+                          if (!controller.isTransfer.value)
                             _buildOptionChip(
                               context,
                               controller,
-                              label: 'To Account',
-                              icon: CupertinoIcons.right_chevron,
+                              label:
+                                  controller.selectedCategory.value?.name ??
+                                  'Category',
+                              icon: CupertinoIcons.tag,
                               onTap: () =>
-                                  _showAccountSheet(context, controller, true),
+                                  _showCategorySheet(context, controller),
                             ),
-                          ],
-                          const SizedBox(width: 12),
-                          _buildOptionChip(
-                            context,
-                            controller,
-                            label: 'Date',
-                            icon: CupertinoIcons.calendar,
-                            onTap: () async {
-                              final date = await showDatePicker(
-                                context: context,
-                                initialDate: controller.selectedDate.value,
-                                firstDate: DateTime(2020),
-                                lastDate: DateTime(2030),
-                              );
-                              if (date != null) {
-                                controller.selectedDate.value = date;
-                              }
-                            },
-                          ),
+                          if (controller.selectedCategory.value != null &&
+                              controller
+                                      .selectedCategory
+                                      .value!
+                                      .subCategories !=
+                                  null &&
+                              controller
+                                  .selectedCategory
+                                  .value!
+                                  .subCategories!
+                                  .isNotEmpty &&
+                              !controller.isTransfer.value)
+                            _buildOptionChip(
+                              context,
+                              controller,
+                              label:
+                                  controller.selectedSubCategory.value ??
+                                  'Subcategory',
+                              icon: CupertinoIcons.arrow_turn_down_right,
+                              onTap: () =>
+                                  _showSubCategorySheet(context, controller),
+                            ),
                         ],
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: 32),
+                  const SizedBox(height: 8),
 
-                    // Type Toggle
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0,
-                        vertical: 8,
-                      ),
-                      child: Obx(
-                        () => Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => controller.toggleType(
-                                    TransactionType.expense,
-                                  ),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 12,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          controller.isExpense.value &&
-                                              !controller.isTransfer.value
-                                          ? Colors.redAccent
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                    child: Text(
-                                      'Expense',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color:
-                                            controller.isExpense.value &&
-                                                !controller.isTransfer.value
-                                            ? Colors.white
-                                            : Colors.black54,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => controller.toggleType(
-                                    TransactionType.income,
-                                  ),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 12,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          !controller.isExpense.value &&
-                                              !controller.isTransfer.value
-                                          ? Colors.green
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                    child: Text(
-                                      'Income',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color:
-                                            !controller.isExpense.value &&
-                                                !controller.isTransfer.value
-                                            ? Colors.white
-                                            : Colors.black54,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => controller.toggleType(
-                                    TransactionType.transfer,
-                                  ),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 12,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: controller.isTransfer.value
-                                          ? Colors.blueAccent
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                    child: Text(
-                                      'Transfer',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: controller.isTransfer.value
-                                            ? Colors.white
-                                            : Colors.black54,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                  // Options Row 2
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _buildOptionChip(
+                          context,
+                          controller,
+                          label: controller.isTransfer.value
+                              ? 'From Account'
+                              : 'Account',
+                          icon: CupertinoIcons.creditcard,
+                          onTap: () =>
+                              _showAccountSheet(context, controller, false),
                         ),
-                      ),
+                        if (controller.isTransfer.value)
+                          _buildOptionChip(
+                            context,
+                            controller,
+                            label: 'To Account',
+                            icon: CupertinoIcons.right_chevron,
+                            onTap: () =>
+                                _showAccountSheet(context, controller, true),
+                          ),
+                        _buildOptionChip(
+                          context,
+                          controller,
+                          label: 'Date',
+                          icon: CupertinoIcons.calendar,
+                          onTap: () async {
+                            final date = await showDatePicker(
+                              context: context,
+                              initialDate: controller.selectedDate.value,
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime(2030),
+                            );
+                            if (date != null) {
+                              controller.selectedDate.value = date;
+                            }
+                          },
+                        ),
+                      ],
                     ),
+                  ),
 
-                    // Proceed Button
-                    const SizedBox(height: 24),
-                  ],
-                ),
+                  const SizedBox(height: 16),
+                ],
               ),
             ),
           ),
@@ -287,8 +270,8 @@ class AddTransactionScreen extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: controller.addTransaction,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00BAF2), // Paytm Cyan
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: const Color(0xFF00BAF2),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
@@ -296,7 +279,7 @@ class AddTransactionScreen extends StatelessWidget {
                 child: const Text(
                   'Proceed',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),

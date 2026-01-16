@@ -38,6 +38,26 @@ const SettingsSchema = CollectionSchema(
       type: IsarType.bool,
     ),
     r'darkMode': PropertySchema(id: 4, name: r'darkMode', type: IsarType.bool),
+    r'fireCurrentAge': PropertySchema(
+      id: 5,
+      name: r'fireCurrentAge',
+      type: IsarType.long,
+    ),
+    r'fireReturnRate': PropertySchema(
+      id: 6,
+      name: r'fireReturnRate',
+      type: IsarType.double,
+    ),
+    r'fireTargetAge': PropertySchema(
+      id: 7,
+      name: r'fireTargetAge',
+      type: IsarType.long,
+    ),
+    r'fireWithdrawalRate': PropertySchema(
+      id: 8,
+      name: r'fireWithdrawalRate',
+      type: IsarType.double,
+    ),
   },
 
   estimateSize: _settingsEstimateSize,
@@ -77,6 +97,10 @@ void _settingsSerialize(
   writer.writeString(offsets[2], object.currencySymbol);
   writer.writeBool(offsets[3], object.dailyReminders);
   writer.writeBool(offsets[4], object.darkMode);
+  writer.writeLong(offsets[5], object.fireCurrentAge);
+  writer.writeDouble(offsets[6], object.fireReturnRate);
+  writer.writeLong(offsets[7], object.fireTargetAge);
+  writer.writeDouble(offsets[8], object.fireWithdrawalRate);
 }
 
 Settings _settingsDeserialize(
@@ -91,6 +115,10 @@ Settings _settingsDeserialize(
   object.currencySymbol = reader.readString(offsets[2]);
   object.dailyReminders = reader.readBool(offsets[3]);
   object.darkMode = reader.readBool(offsets[4]);
+  object.fireCurrentAge = reader.readLongOrNull(offsets[5]);
+  object.fireReturnRate = reader.readDoubleOrNull(offsets[6]);
+  object.fireTargetAge = reader.readLongOrNull(offsets[7]);
+  object.fireWithdrawalRate = reader.readDoubleOrNull(offsets[8]);
   object.id = id;
   return object;
 }
@@ -112,6 +140,14 @@ P _settingsDeserializeProp<P>(
       return (reader.readBool(offset)) as P;
     case 4:
       return (reader.readBool(offset)) as P;
+    case 5:
+      return (reader.readLongOrNull(offset)) as P;
+    case 6:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 7:
+      return (reader.readLongOrNull(offset)) as P;
+    case 8:
+      return (reader.readDoubleOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -530,6 +566,341 @@ extension SettingsQueryFilter
     });
   }
 
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireCurrentAgeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'fireCurrentAge'),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireCurrentAgeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'fireCurrentAge'),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition> fireCurrentAgeEqualTo(
+    int? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'fireCurrentAge', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireCurrentAgeGreaterThan(int? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'fireCurrentAge',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireCurrentAgeLessThan(int? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'fireCurrentAge',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition> fireCurrentAgeBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'fireCurrentAge',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireReturnRateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'fireReturnRate'),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireReturnRateIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'fireReturnRate'),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition> fireReturnRateEqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'fireReturnRate',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireReturnRateGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'fireReturnRate',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireReturnRateLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'fireReturnRate',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition> fireReturnRateBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'fireReturnRate',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireTargetAgeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'fireTargetAge'),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireTargetAgeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'fireTargetAge'),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition> fireTargetAgeEqualTo(
+    int? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'fireTargetAge', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireTargetAgeGreaterThan(int? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'fireTargetAge',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition> fireTargetAgeLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'fireTargetAge',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition> fireTargetAgeBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'fireTargetAge',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireWithdrawalRateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'fireWithdrawalRate'),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireWithdrawalRateIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'fireWithdrawalRate'),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireWithdrawalRateEqualTo(double? value, {double epsilon = Query.epsilon}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'fireWithdrawalRate',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireWithdrawalRateGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'fireWithdrawalRate',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireWithdrawalRateLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'fireWithdrawalRate',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition>
+  fireWithdrawalRateBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'fireWithdrawalRate',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
   QueryBuilder<Settings, Settings, QAfterFilterCondition> idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -654,6 +1025,55 @@ extension SettingsQuerySortBy on QueryBuilder<Settings, Settings, QSortBy> {
       return query.addSortBy(r'darkMode', Sort.desc);
     });
   }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy> sortByFireCurrentAge() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fireCurrentAge', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy> sortByFireCurrentAgeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fireCurrentAge', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy> sortByFireReturnRate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fireReturnRate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy> sortByFireReturnRateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fireReturnRate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy> sortByFireTargetAge() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fireTargetAge', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy> sortByFireTargetAgeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fireTargetAge', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy> sortByFireWithdrawalRate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fireWithdrawalRate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy>
+  sortByFireWithdrawalRateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fireWithdrawalRate', Sort.desc);
+    });
+  }
 }
 
 extension SettingsQuerySortThenBy
@@ -718,6 +1138,55 @@ extension SettingsQuerySortThenBy
     });
   }
 
+  QueryBuilder<Settings, Settings, QAfterSortBy> thenByFireCurrentAge() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fireCurrentAge', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy> thenByFireCurrentAgeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fireCurrentAge', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy> thenByFireReturnRate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fireReturnRate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy> thenByFireReturnRateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fireReturnRate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy> thenByFireTargetAge() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fireTargetAge', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy> thenByFireTargetAgeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fireTargetAge', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy> thenByFireWithdrawalRate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fireWithdrawalRate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy>
+  thenByFireWithdrawalRateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fireWithdrawalRate', Sort.desc);
+    });
+  }
+
   QueryBuilder<Settings, Settings, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -769,6 +1238,30 @@ extension SettingsQueryWhereDistinct
       return query.addDistinctBy(r'darkMode');
     });
   }
+
+  QueryBuilder<Settings, Settings, QDistinct> distinctByFireCurrentAge() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'fireCurrentAge');
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QDistinct> distinctByFireReturnRate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'fireReturnRate');
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QDistinct> distinctByFireTargetAge() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'fireTargetAge');
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QDistinct> distinctByFireWithdrawalRate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'fireWithdrawalRate');
+    });
+  }
 }
 
 extension SettingsQueryProperty
@@ -806,6 +1299,31 @@ extension SettingsQueryProperty
   QueryBuilder<Settings, bool, QQueryOperations> darkModeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'darkMode');
+    });
+  }
+
+  QueryBuilder<Settings, int?, QQueryOperations> fireCurrentAgeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'fireCurrentAge');
+    });
+  }
+
+  QueryBuilder<Settings, double?, QQueryOperations> fireReturnRateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'fireReturnRate');
+    });
+  }
+
+  QueryBuilder<Settings, int?, QQueryOperations> fireTargetAgeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'fireTargetAge');
+    });
+  }
+
+  QueryBuilder<Settings, double?, QQueryOperations>
+  fireWithdrawalRateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'fireWithdrawalRate');
     });
   }
 }

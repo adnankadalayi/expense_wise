@@ -103,15 +103,15 @@ class _SplashContentState extends State<_SplashContent>
                             width: 120,
                             height: 120,
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.15),
+                              color: Colors.white.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(32),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                                 width: 2,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color: Colors.black.withValues(alpha: 0.2),
                                   blurRadius: 30,
                                   offset: const Offset(0, 10),
                                 ),
@@ -161,7 +161,7 @@ class _SplashContentState extends State<_SplashContent>
                           'Track your money, save your future',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             fontWeight: FontWeight.w400,
                             letterSpacing: 0.2,
                           ),
@@ -186,7 +186,7 @@ class _SplashContentState extends State<_SplashContent>
                       child: CircularProgressIndicator(
                         strokeWidth: 3,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.white.withOpacity(0.8),
+                          Colors.white.withValues(alpha: 0.8),
                         ),
                       ),
                     ),
@@ -195,7 +195,7 @@ class _SplashContentState extends State<_SplashContent>
                       'Loading...',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                         fontWeight: FontWeight.w500,
                       ),
                     ),

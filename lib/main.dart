@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import 'app/routes/app_pages.dart';
 import 'app/services/storage_service.dart';
+import 'app/services/security_service.dart';
 import 'app/theme/app_theme.dart';
 
 void main() async {
@@ -13,6 +14,7 @@ void main() async {
 
 Future<void> initServices() async {
   await Get.putAsync(() => StorageService().init());
+  Get.put(SecurityService());
 }
 
 class MyApp extends StatelessWidget {

@@ -27,12 +27,12 @@ class AppTheme {
         bodyLarge: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: Colors.black.withOpacity(0.9),
+          color: Colors.black.withValues(alpha: 0.9),
         ),
         labelSmall: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w400,
-          color: Colors.black.withOpacity(0.7),
+          color: Colors.black.withValues(alpha: 0.7),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -44,7 +44,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(25),
           ),
           elevation: 10,
-          shadowColor: secondaryColor.withOpacity(0.4),
+          shadowColor: secondaryColor.withValues(alpha: 0.4),
         ),
       ),
       appBarTheme: const AppBarTheme(
@@ -55,7 +55,7 @@ class AppTheme {
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: Colors.white,
         selectedItemColor: secondaryColor,
-        unselectedItemColor: Colors.black.withOpacity(0.6),
+        unselectedItemColor: Colors.black.withValues(alpha: 0.6),
       ),
     );
   }
@@ -82,12 +82,12 @@ class AppTheme {
         bodyLarge: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: Colors.white.withOpacity(0.9),
+          color: Colors.white.withValues(alpha: 0.9),
         ),
         labelSmall: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w400,
-          color: Colors.white.withOpacity(0.7),
+          color: Colors.white.withValues(alpha: 0.7),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -99,7 +99,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(25),
           ),
           elevation: 10,
-          shadowColor: secondaryColor.withOpacity(0.4),
+          shadowColor: secondaryColor.withValues(alpha: 0.4),
         ),
       ),
       appBarTheme: AppBarTheme(
@@ -110,7 +110,7 @@ class AppTheme {
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: Colors.grey[900],
         selectedItemColor: secondaryColor,
-        unselectedItemColor: Colors.white.withOpacity(0.6),
+        unselectedItemColor: Colors.white.withValues(alpha: 0.6),
       ),
     );
   }

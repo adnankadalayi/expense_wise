@@ -210,4 +210,39 @@ class StorageService extends GetxService {
     currencyCode.value = settings.currencyCode;
     currencySymbol.value = settings.currencySymbol;
   }
+
+  Future<void> saveSetting(String key, String value) async {
+    await db.writeTxn(() async {
+      switch (key) {
+        case 'fire_current_age':
+          settings.fireCurrentAge = int.tryParse(value);
+          break;
+        case 'fire_target_age':
+          settings.fireTargetAge = int.tryParse(value);
+          break;
+        case 'fire_return_rate':
+          settings.fireReturnRate = double.tryParse(value);
+          break;
+        case 'fire_withdrawal_rate':
+          settings.fireWithdrawalRate = double.tryParse(value);
+          break;
+      }
+      await db.settings.put(settings);
+    });
+  }
+
+  Future<String?> getSetting(String key) async {
+    switch (key) {
+      case 'fire_current_age':
+        return settings.fireCurrentAge?.toString();
+      case 'fire_target_age':
+        return settings.fireTargetAge?.toString();
+      case 'fire_return_rate':
+        return settings.fireReturnRate?.toString();
+      case 'fire_withdrawal_rate':
+        return settings.fireWithdrawalRate?.toString();
+      default:
+        return null;
+    }
+  }
 }

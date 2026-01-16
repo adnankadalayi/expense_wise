@@ -292,7 +292,9 @@ class _AddEditCategoryViewState extends State<AddEditCategoryView> {
                       height: 48,
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? Color(int.parse(_selectedColor)).withOpacity(0.2)
+                            ? Color(
+                                int.parse(_selectedColor),
+                              ).withValues(alpha: 0.2)
                             : Colors.grey[100],
                         borderRadius: BorderRadius.circular(12),
                         border: isSelected
@@ -511,7 +513,7 @@ class _AddEditCategoryViewState extends State<AddEditCategoryView> {
                             color: isSelected
                                 ? Color(
                                     int.parse(selectedColor!),
-                                  ).withOpacity(0.2)
+                                  ).withValues(alpha: 0.2)
                                 : Colors.grey[100],
                             borderRadius: BorderRadius.circular(8),
                             border: isSelected

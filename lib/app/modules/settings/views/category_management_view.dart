@@ -70,7 +70,7 @@ class CategoryManagementView extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
+                            color: Colors.white.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: TabBar(
@@ -79,7 +79,9 @@ class CategoryManagementView extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             labelColor: const Color(0xFF002E6E),
-                            unselectedLabelColor: Colors.white.withOpacity(0.7),
+                            unselectedLabelColor: Colors.white.withValues(
+                              alpha: 0.7,
+                            ),
                             labelStyle: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
@@ -137,7 +139,7 @@ class CategoryManagementView extends StatelessWidget {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF00BAF2).withOpacity(0.4),
+                color: const Color(0xFF00BAF2).withValues(alpha: 0.4),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -269,7 +271,7 @@ class CategoryManagementView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -287,10 +289,10 @@ class CategoryManagementView extends StatelessWidget {
                               colors: [
                                 Color(
                                   int.parse(category.colorHex!),
-                                ).withOpacity(0.15),
+                                ).withValues(alpha: 0.15),
                                 Color(
                                   int.parse(category.colorHex!),
-                                ).withOpacity(0.25),
+                                ).withValues(alpha: 0.25),
                               ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,

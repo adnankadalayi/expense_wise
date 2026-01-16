@@ -12,6 +12,12 @@ class Transaction {
 
   String? note;
 
+  /// For transfers: ID of the paired transfer transaction
+  int? linkedTransactionId;
+
+  /// For transfers: Optional transfer fee
+  double? transferFee;
+
   String? subCategory;
 
   late DateTime date;

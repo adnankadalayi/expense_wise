@@ -1,20 +1,26 @@
 import 'package:expense_wise/app/data/models/budget.dart';
 import 'package:expense_wise/app/data/models/category.dart';
-import 'package:expense_wise/app/data/models/transaction.dart';
+import 'package:expense_wise/app/services/budget_tracking_service.dart';
 import 'package:expense_wise/app/services/storage_service.dart';
 import 'package:get/get.dart';
 import 'package:isar_community/isar.dart';
 
 class BudgetsController extends GetxController {
   final StorageService _storageService = Get.find<StorageService>();
+  final BudgetTrackingService _budgetTrackingService =
+      Get.find<BudgetTrackingService>();
 
   final budgets = <Budget>[].obs;
   final categories = <Category>[].obs;
-  final budgetProgress = <int, double>{}.obs; // Map<BudgetID, SpentAmount>
+  final budgetSpending =
+      <int, Map<String, dynamic>>{}.obs; // Map<BudgetID, SpendingData>
 
   // Form selections
   final selectedCategory = Rxn<Category>();
   final amountText = ''.obs;
+  final selectedPeriod = BudgetPeriod.monthly.obs;
+  final notificationThreshold = 80.0.obs;
+  final isNotificationEnabled = true.obs;
 
   @override
   void onInit() {
@@ -29,40 +35,28 @@ class BudgetsController extends GetxController {
   }
 
   void loadBudgets() async {
-    final allBudgets = await _storageService.db.budgets.where().findAll();
+    final allBudgets = await _storageService.db.budgets
+        .filter()
+        .isActiveEqualTo(true)
+        .findAll();
 
-    // Calculate spent for each budget
-    final progressMap = <int, double>{};
+    // Calculate spending for each budget using the tracking service
+    final spendingMap = <int, Map<String, dynamic>>{};
     for (var budget in allBudgets) {
       await budget.category.load();
       if (budget.category.value != null) {
-        final categoryId = budget.category.value!.id;
-
-        // Query transactions for this category
-        final transactions = await _storageService.db.transactions
-            .filter()
-            .category((q) => q.idEqualTo(categoryId))
-            .typeEqualTo(TransactionType.expense)
-            .findAll();
-
-        // TODO: Filter by period (month/week)
-        // For now, assume all time or current month
-        final now = DateTime.now();
-        final currentMonthTxs = transactions
-            .where((t) => t.date.year == now.year && t.date.month == now.month)
-            .toList();
-
-        double spent = 0;
-        for (var tx in currentMonthTxs) {
-          spent += tx
-              .amount; // expenses are usually positive in this context or abs()
-        }
-        progressMap[budget.id] = spent;
+        final spendingData = await _budgetTrackingService.getBudgetSpending(
+          budget,
+        );
+        spendingMap[budget.id] = spendingData;
       }
     }
 
-    budgetProgress.assignAll(progressMap);
+    budgetSpending.assignAll(spendingMap);
     budgets.assignAll(allBudgets);
+
+    // Check budgets for notifications
+    await _budgetTrackingService.checkBudgets();
   }
 
   Future<void> addBudget() async {
@@ -76,11 +70,12 @@ class BudgetsController extends GetxController {
       return;
     }
 
-    // Check if budget exists for this category? (Optional)
-
     final budget = Budget()
       ..amount = amount
-      ..period = BudgetPeriod.monthly; // Default
+      ..period = selectedPeriod.value
+      ..notificationThreshold = notificationThreshold.value
+      ..isNotificationEnabled = isNotificationEnabled.value
+      ..isActive = true;
 
     budget.category.value = selectedCategory.value;
 
@@ -88,6 +83,13 @@ class BudgetsController extends GetxController {
       await _storageService.db.budgets.put(budget);
       await budget.category.save();
     });
+
+    // Reset form
+    amountText.value = '';
+    selectedCategory.value = null;
+    notificationThreshold.value = 80.0;
+    isNotificationEnabled.value = true;
+    selectedPeriod.value = BudgetPeriod.monthly;
 
     loadBudgets();
     Get.back(); // Close bottom sheet or screen

@@ -18,8 +18,19 @@ const BudgetSchema = CollectionSchema(
   id: -3383598594604670326,
   properties: {
     r'amount': PropertySchema(id: 0, name: r'amount', type: IsarType.double),
+    r'isActive': PropertySchema(id: 1, name: r'isActive', type: IsarType.bool),
+    r'isNotificationEnabled': PropertySchema(
+      id: 2,
+      name: r'isNotificationEnabled',
+      type: IsarType.bool,
+    ),
+    r'notificationThreshold': PropertySchema(
+      id: 3,
+      name: r'notificationThreshold',
+      type: IsarType.double,
+    ),
     r'period': PropertySchema(
-      id: 1,
+      id: 4,
       name: r'period',
       type: IsarType.byte,
       enumMap: _BudgetperiodEnumValueMap,
@@ -64,7 +75,10 @@ void _budgetSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeDouble(offsets[0], object.amount);
-  writer.writeByte(offsets[1], object.period.index);
+  writer.writeBool(offsets[1], object.isActive);
+  writer.writeBool(offsets[2], object.isNotificationEnabled);
+  writer.writeDouble(offsets[3], object.notificationThreshold);
+  writer.writeByte(offsets[4], object.period.index);
 }
 
 Budget _budgetDeserialize(
@@ -76,8 +90,11 @@ Budget _budgetDeserialize(
   final object = Budget();
   object.amount = reader.readDouble(offsets[0]);
   object.id = id;
+  object.isActive = reader.readBool(offsets[1]);
+  object.isNotificationEnabled = reader.readBool(offsets[2]);
+  object.notificationThreshold = reader.readDouble(offsets[3]);
   object.period =
-      _BudgetperiodValueEnumMap[reader.readByteOrNull(offsets[1])] ??
+      _BudgetperiodValueEnumMap[reader.readByteOrNull(offsets[4])] ??
       BudgetPeriod.weekly;
   return object;
 }
@@ -92,6 +109,12 @@ P _budgetDeserializeProp<P>(
     case 0:
       return (reader.readDouble(offset)) as P;
     case 1:
+      return (reader.readBool(offset)) as P;
+    case 2:
+      return (reader.readBool(offset)) as P;
+    case 3:
+      return (reader.readDouble(offset)) as P;
+    case 4:
       return (_BudgetperiodValueEnumMap[reader.readByteOrNull(offset)] ??
               BudgetPeriod.weekly)
           as P;
@@ -330,6 +353,103 @@ extension BudgetQueryFilter on QueryBuilder<Budget, Budget, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Budget, Budget, QAfterFilterCondition> isActiveEqualTo(
+    bool value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'isActive', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterFilterCondition>
+  isNotificationEnabledEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'isNotificationEnabled',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterFilterCondition>
+  notificationThresholdEqualTo(double value, {double epsilon = Query.epsilon}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'notificationThreshold',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterFilterCondition>
+  notificationThresholdGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'notificationThreshold',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterFilterCondition>
+  notificationThresholdLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'notificationThreshold',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterFilterCondition>
+  notificationThresholdBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'notificationThreshold',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
   QueryBuilder<Budget, Budget, QAfterFilterCondition> periodEqualTo(
     BudgetPeriod value,
   ) {
@@ -421,6 +541,42 @@ extension BudgetQuerySortBy on QueryBuilder<Budget, Budget, QSortBy> {
     });
   }
 
+  QueryBuilder<Budget, Budget, QAfterSortBy> sortByIsActive() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isActive', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> sortByIsActiveDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isActive', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> sortByIsNotificationEnabled() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isNotificationEnabled', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> sortByIsNotificationEnabledDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isNotificationEnabled', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> sortByNotificationThreshold() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notificationThreshold', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> sortByNotificationThresholdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notificationThreshold', Sort.desc);
+    });
+  }
+
   QueryBuilder<Budget, Budget, QAfterSortBy> sortByPeriod() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'period', Sort.asc);
@@ -459,6 +615,42 @@ extension BudgetQuerySortThenBy on QueryBuilder<Budget, Budget, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Budget, Budget, QAfterSortBy> thenByIsActive() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isActive', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> thenByIsActiveDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isActive', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> thenByIsNotificationEnabled() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isNotificationEnabled', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> thenByIsNotificationEnabledDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isNotificationEnabled', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> thenByNotificationThreshold() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notificationThreshold', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> thenByNotificationThresholdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notificationThreshold', Sort.desc);
+    });
+  }
+
   QueryBuilder<Budget, Budget, QAfterSortBy> thenByPeriod() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'period', Sort.asc);
@@ -479,6 +671,24 @@ extension BudgetQueryWhereDistinct on QueryBuilder<Budget, Budget, QDistinct> {
     });
   }
 
+  QueryBuilder<Budget, Budget, QDistinct> distinctByIsActive() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isActive');
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QDistinct> distinctByIsNotificationEnabled() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isNotificationEnabled');
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QDistinct> distinctByNotificationThreshold() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'notificationThreshold');
+    });
+  }
+
   QueryBuilder<Budget, Budget, QDistinct> distinctByPeriod() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'period');
@@ -496,6 +706,25 @@ extension BudgetQueryProperty on QueryBuilder<Budget, Budget, QQueryProperty> {
   QueryBuilder<Budget, double, QQueryOperations> amountProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'amount');
+    });
+  }
+
+  QueryBuilder<Budget, bool, QQueryOperations> isActiveProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isActive');
+    });
+  }
+
+  QueryBuilder<Budget, bool, QQueryOperations> isNotificationEnabledProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isNotificationEnabled');
+    });
+  }
+
+  QueryBuilder<Budget, double, QQueryOperations>
+  notificationThresholdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'notificationThreshold');
     });
   }
 
