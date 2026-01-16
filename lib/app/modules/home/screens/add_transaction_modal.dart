@@ -6,8 +6,8 @@ import 'package:expense_wise/app/data/models/category.dart';
 import 'package:expense_wise/app/data/models/transaction.dart';
 import 'package:intl/intl.dart';
 
-class AddTransactionScreen extends StatelessWidget {
-  const AddTransactionScreen({super.key});
+class AddTransactionModal extends StatelessWidget {
+  const AddTransactionModal({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -391,6 +391,7 @@ class AddTransactionScreen extends StatelessWidget {
                     return GestureDetector(
                       onTap: () {
                         controller.selectedCategory.value = category;
+                        Get.back();
                       },
                       child: Container(
                         margin: const EdgeInsets.only(right: 12),
