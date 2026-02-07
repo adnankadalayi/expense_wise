@@ -105,42 +105,50 @@ class AllTransactionController extends GetxController
       }).toList();
     }
 
-    // 4. Group by Month
+    // 4. Group by Day
     final grouped = <String, Map<String, dynamic>>{};
 
     for (var tx in allTxs) {
       await tx.category.load(); // Ensure loaded
-      final monthKey = DateFormat('MMMM yyyy').format(tx.date);
+      // Use yyyyMMdd as key for easy uniqueness and sorting check (though we sort list later)
+      final dateKey = DateFormat('yyyyMMdd').format(tx.date);
 
-      if (!grouped.containsKey(monthKey)) {
-        grouped[monthKey] = {
-          'month': monthKey,
+      if (!grouped.containsKey(dateKey)) {
+        grouped[dateKey] = {
+          'dayLabel': _getDayLabel(tx.date),
+          'date': tx.date, // For sorting
           'total': 0.0,
           'transactions': <Transaction>[],
-          'sortDate': DateTime(
-            tx.date.year,
-            tx.date.month,
-          ), // helper for sorting groups
         };
       }
 
-      grouped[monthKey]!['transactions'].add(tx);
+      grouped[dateKey]!['transactions'].add(tx);
 
-      // Calculate total for month (Net: Income - Expense)
+      // Calculate total for day (Net: Income - Expense)
       if (tx.type == TransactionType.income) {
-        grouped[monthKey]!['total'] += tx.amount;
+        grouped[dateKey]!['total'] += tx.amount;
       } else {
-        grouped[monthKey]!['total'] -= tx.amount;
+        grouped[dateKey]!['total'] -= tx.amount;
       }
     }
 
-    // Convert to list and sort groups descending
+    // Convert to list and sort groups descending by date
     final result = grouped.values.toList();
     result.sort(
-      (a, b) =>
-          (b['sortDate'] as DateTime).compareTo(a['sortDate'] as DateTime),
+      (a, b) => (b['date'] as DateTime).compareTo(a['date'] as DateTime),
     );
 
     groupedTransactions.assignAll(result);
+  }
+
+  String _getDayLabel(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final check = DateTime(date.year, date.month, date.day);
+
+    if (check == today) return 'Today';
+    if (check == yesterday) return 'Yesterday';
+    return DateFormat('EEE, dd MMM').format(date);
   }
 }

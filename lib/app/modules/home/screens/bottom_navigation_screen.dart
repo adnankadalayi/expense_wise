@@ -1,9 +1,9 @@
 import 'package:expense_wise/app/modules/home/controllers/home_controller.dart';
-import 'package:expense_wise/app/modules/home/screens/add_transaction.dart';
 import 'package:expense_wise/app/modules/home/screens/home_screen.dart';
-import 'package:expense_wise/app/modules/home/screens/stat_screen.dart';
-import 'package:expense_wise/app/modules/home/screens/categories_screen.dart';
-import 'package:expense_wise/app/modules/home/screens/settings_screen.dart';
+import 'package:expense_wise/app/modules/home/screens/stat_screen.dart'; // Will be renamed/refactored to Analytics
+import 'package:expense_wise/app/modules/settings/views/category_management_view.dart';
+import 'package:expense_wise/app/modules/transactions/screens/all_transaction.dart';
+import 'package:expense_wise/app/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -12,91 +12,30 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Ensure controller is found
     final controller = Get.find<HomeController>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF002E6E), // Fallback
-      resizeToAvoidBottomInset: false, // Handle keyboard in stack if needed
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // 1. Shared Background Gradient
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF002E6E),
-                  Color(0xFF00BAF2),
-                ], // Paytm Dark Blue to Cyan
-              ),
-            ),
-          ),
+      backgroundColor: AppTheme.darkBackground,
+      resizeToAvoidBottomInset: false,
+      body: Obx(
+        () => IndexedStack(
+          index: controller.selectedNavIndex.value,
+          children: [
+            // 0. Home
+            const HomeBody(), // We need to check if HomeBody includes the header or if we need to restructure.
+            // For now assuming HomeBody is the full page content for Home tab.
 
-          // 2. Headers Layer (Top)
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              bottom: false,
-              child: Obx(
-                () => IndexedStack(
-                  index: controller.selectedNavIndex.value,
-                  children: const [
-                    HomeHeader(),
-                    StatsHeader(),
-                    CategoriesHeader(),
-                    SettingsHeader(),
-                  ],
-                ),
-              ),
-            ),
-          ),
+            // 1. Categories
+            const CategoryManagementView(),
 
-          // 3. Animated Content Card (Bottom Stack)
-          Obx(
-            () => AnimatedPositioned(
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.fastOutSlowIn,
-              top: controller.currentCardTop,
-              left: 0,
-              right: 0,
-              bottom: 0, // Extends to bottom
-              child: Container(
-                clipBehavior: Clip.antiAlias, // Clip top corners
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(32),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 20,
-                      offset: const Offset(0, -5),
-                    ),
-                  ],
-                ),
-                child: IndexedStack(
-                  index: controller.selectedNavIndex.value,
-                  children: const [
-                    HomeBody(),
-                    StatsBody(),
-                    CategoriesBody(),
-                    SettingsBody(),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // 4. Bottom Navigation Bar
-          Positioned(bottom: 0, left: 0, right: 0, child: const BottomNavBar()),
-        ],
+            // 2. Analytics (Stats)
+            const StatsScreen(),
+            // 3. Transactions
+            AllTransactionsScreen(), // Verify if this is full screen
+          ],
+        ),
       ),
+      bottomNavigationBar: const BottomNavBar(),
     );
   }
 }
@@ -108,121 +47,45 @@ class BottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
 
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(25),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              blurRadius: 30,
-              offset: const Offset(0, 10),
-            ),
-          ],
+    return Obx(
+      () => BottomNavigationBar(
+        currentIndex: controller.selectedNavIndex.value,
+        onTap: (index) => controller.selectedNavIndex.value = index,
+        backgroundColor: AppTheme.darkBackground,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.grey.shade600,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        selectedLabelStyle: const TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w500,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Obx(
-              () => _buildNavItem(
-                icon: Icons.home_rounded,
-                label: 'Home',
-                isSelected: controller.selectedNavIndex.value == 0,
-                onTap: () => controller.selectedNavIndex.value = 0,
-              ),
-            ),
-            Obx(
-              () => _buildNavItem(
-                icon: Icons.bar_chart_rounded,
-                label: 'Stats',
-                isSelected: controller.selectedNavIndex.value == 1,
-                onTap: () => controller.selectedNavIndex.value = 1,
-              ),
-            ),
-            GestureDetector(
-              onTap: () => Get.to(() => const AddTransactionScreen()),
-              child: Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF00BAF2), // Paytm Cyan
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF00BAF2).withOpacity(0.4),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Icon(Icons.add, color: Colors.white, size: 24),
-              ),
-            ),
-            Obx(
-              () => _buildNavItem(
-                icon: Icons.grid_view_rounded,
-                label: 'Categories',
-                isSelected: controller.selectedNavIndex.value == 2,
-                onTap: () => controller.selectedNavIndex.value = 2,
-              ),
-            ),
-            Obx(
-              () => _buildNavItem(
-                icon: Icons.settings_rounded,
-                label: 'Settings',
-                isSelected: controller.selectedNavIndex.value == 3,
-                onTap: () => controller.selectedNavIndex.value = 3,
-              ),
-            ),
-          ],
+        unselectedLabelStyle: const TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w500,
         ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem({
-    required IconData icon,
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? Colors.white.withOpacity(0.2)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? Colors.white : Colors.grey.shade600,
-              size: 24,
-            ),
-            if (isSelected) ...[
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ],
-        ),
+        elevation: 0,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.pie_chart_outline), // Or a similar category icon
+            label: 'Categories',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart_rounded),
+            label: 'Analytics',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.receipt_long_rounded), // Or Icons.list_alt
+            label: 'Transactions',
+          ),
+        ],
       ),
     );
   }
 }
+
+// Temporary placeholder wrappers if the original Body widgets were only partials
+// logic to handle Headers vs Body from original code is simplified here.
+// We will need to update the individual screens to be self-contained Scaffolds or Containers.

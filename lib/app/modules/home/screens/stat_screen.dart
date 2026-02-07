@@ -1,9 +1,28 @@
 import 'package:expense_wise/app/modules/home/controllers/stats_screen_controller.dart';
+import 'package:expense_wise/app/theme/app_theme.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+
+class StatsScreen extends StatelessWidget {
+  const StatsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppTheme.darkBackground,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(
+          130,
+        ), // Adjust height for header + month selector
+        child: const StatsHeader(),
+      ),
+      body: const StatsBody(),
+    );
+  }
+}
 
 class StatsHeader extends StatelessWidget {
   const StatsHeader({super.key});
@@ -12,103 +31,104 @@ class StatsHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(StatisticsController());
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-      child: SlideTransition(
-        position: controller.headerSlideAnimation,
-        child: FadeTransition(
-          opacity: controller.headerFadeAnimation,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Analytics',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      CupertinoIcons.pencil,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ],
-              ),
-              // const SizedBox(height: 5), // Same spacing as Categories
-
-              // Month Selector Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        CupertinoIcons.calendar,
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 10, 24, 16),
+        child: SlideTransition(
+          position: controller.headerSlideAnimation,
+          child: FadeTransition(
+            opacity: controller.headerFadeAnimation,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Analytics',
+                      style: TextStyle(
                         color: Colors.white,
-                        size: 16,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
                       ),
-                      const SizedBox(width: 8),
-                      Obx(
-                        () => Text(
-                          DateFormat(
-                            'MMMM yyyy',
-                          ).format(controller.selectedDate.value),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                    ),
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        CupertinoIcons.pencil,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Month Selector Row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          CupertinoIcons.calendar,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 8),
+                        Obx(
+                          () => Text(
+                            DateFormat(
+                              'MMMM yyyy',
+                            ).format(controller.selectedDate.value),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: controller.previousMonth,
-                        icon: const Icon(
-                          CupertinoIcons.left_chevron,
-                          color: Colors.white,
-                          size: 24,
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: controller.previousMonth,
+                          icon: const Icon(
+                            CupertinoIcons.left_chevron,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
                         ),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        onPressed: controller.nextMonth,
-                        icon: const Icon(
-                          CupertinoIcons.right_chevron,
-                          color: Colors.white,
-                          size: 24,
+                        const SizedBox(width: 8),
+                        IconButton(
+                          onPressed: controller.nextMonth,
+                          icon: const Icon(
+                            CupertinoIcons.right_chevron,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
                         ),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        onPressed: () {}, // Filter action
-                        icon: const Icon(
-                          CupertinoIcons.slider_horizontal_3,
-                          color: Colors.white,
-                          size: 24,
+                        const SizedBox(width: 8),
+                        IconButton(
+                          onPressed: () {}, // Filter action
+                          icon: const Icon(
+                            CupertinoIcons.slider_horizontal_3,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
                         ),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -137,12 +157,12 @@ class StatsBody extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // Filter Pills (Visual only for now as per requirement)
+              // Filter Pills
               Row(
                 children: [
                   _buildPill('Income', false),
                   const SizedBox(width: 12),
-                  _buildPill('Expenses', false), // Can make interactive later
+                  _buildPill('Expenses', false),
                   const SizedBox(width: 12),
                   _buildPill('Total', true),
                   const Spacer(),
@@ -166,6 +186,11 @@ class StatsBody extends StatelessWidget {
               // Average Card
               _buildAverageCard(controller),
 
+              const SizedBox(height: 24),
+
+              // Compare Card (New)
+              _buildCompareCard(controller),
+
               const SizedBox(height: 80), // Bottom padding
             ],
           ),
@@ -178,13 +203,13 @@ class StatsBody extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: isActive ? const Color(0xFF002E6E) : Colors.grey.shade200,
+        color: isActive ? AppTheme.primaryColor : AppTheme.darkSurface,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         text,
         style: TextStyle(
-          color: isActive ? Colors.white : Colors.grey.shade700,
+          color: isActive ? Colors.white : Colors.grey.shade400,
           fontWeight: FontWeight.w600,
           fontSize: 14,
         ),
@@ -197,7 +222,6 @@ class StatsBody extends StatelessWidget {
       height: 300,
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(0, 20, 20, 0),
-      // Keeping it clean/transparent or could add a background
       child: Obx(
         () => LineChart(
           LineChartData(
@@ -207,12 +231,7 @@ class StatsBody extends StatelessWidget {
                 sideTitles: SideTitles(
                   showTitles: true,
                   getTitlesWidget: (value, meta) {
-                    if (value == 0) {
-                      return const Text(
-                        '0',
-                        style: TextStyle(color: Colors.grey, fontSize: 10),
-                      );
-                    }
+                    if (value == 0) return const SizedBox.shrink();
                     if (value >= 1000) {
                       return Text(
                         '${(value / 1000).toStringAsFixed(0)}k',
@@ -222,10 +241,15 @@ class StatsBody extends StatelessWidget {
                         ),
                       );
                     }
-                    return const SizedBox.shrink();
+                    return Text(
+                      value.toStringAsFixed(0),
+                      style: const TextStyle(color: Colors.grey, fontSize: 10),
+                    );
                   },
                   reservedSize: 30,
-                  interval: controller.maxY.value / 4,
+                  interval: controller.maxY.value > 0
+                      ? controller.maxY.value / 4
+                      : 100.0,
                 ),
               ),
               bottomTitles: AxisTitles(
@@ -233,12 +257,11 @@ class StatsBody extends StatelessWidget {
                   showTitles: true,
                   getTitlesWidget: (value, meta) {
                     int day = value.toInt();
-                    // Show label every 5 days or so
                     if (day % 5 == 0 && day > 0 && day <= 31) {
                       return Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
-                          'Jan $day', // Ideally format using selectedDate month
+                          day.toString(),
                           style: const TextStyle(
                             color: Colors.grey,
                             fontSize: 10,
@@ -258,12 +281,12 @@ class StatsBody extends StatelessWidget {
             ),
             borderData: FlBorderData(show: false),
             minX: 1,
-            maxX: 31, // Standard month max
+            maxX: 31,
             minY: 0,
             maxY: controller.maxY.value,
             lineTouchData: LineTouchData(
               touchTooltipData: LineTouchTooltipData(
-                getTooltipColor: (_) => Colors.blueGrey.withOpacity(0.8),
+                getTooltipColor: (_) => AppTheme.darkSurface,
               ),
             ),
             lineBarsData: [
@@ -271,20 +294,20 @@ class StatsBody extends StatelessWidget {
               LineChartBarData(
                 spots: controller.incomeSpots,
                 isCurved: true,
-                color: Colors.green,
+                color: AppTheme.incomeColor,
                 barWidth: 3,
                 isStrokeCapRound: true,
                 dotData: FlDotData(show: false),
                 belowBarData: BarAreaData(
                   show: true,
-                  color: Colors.green.withOpacity(0.1),
+                  color: AppTheme.incomeColor.withOpacity(0.1),
                 ),
               ),
               // Expense Line (Red)
               LineChartBarData(
                 spots: controller.expenseSpots,
                 isCurved: true,
-                color: Colors.red,
+                color: AppTheme.expenseColor,
                 barWidth: 3,
                 isStrokeCapRound: true,
                 dotData: FlDotData(show: false),
@@ -301,25 +324,34 @@ class StatsBody extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FA), // Light grey background
-        borderRadius: BorderRadius.circular(20),
+        color: AppTheme.darkSurface,
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Cash flow',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF333333),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Cash flow',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+              const Icon(Icons.more_vert, color: Colors.white54, size: 20),
+            ],
           ),
           const SizedBox(height: 4),
           Obx(
             () => Text(
               DateFormat('MMMM yyyy').format(controller.selectedDate.value),
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.5),
+                fontSize: 12,
+              ),
             ),
           ),
           const SizedBox(height: 20),
@@ -327,48 +359,51 @@ class StatsBody extends StatelessWidget {
           // Income Row
           _buildCashFlowRow(
             icon: CupertinoIcons.arrow_up_circle_fill,
-            iconColor: Colors.green,
+            iconColor: AppTheme.incomeColor,
             label: 'Income',
             amount: controller.totalIncome,
-            amountColor: Colors.green,
+            amountColor: AppTheme.incomeColor,
           ),
           const SizedBox(height: 16),
 
           // Expense Row
           _buildCashFlowRow(
             icon: CupertinoIcons.arrow_down_circle_fill,
-            iconColor: Colors.red,
+            iconColor: AppTheme.expenseColor,
             label: 'Expenses',
             amount: controller.totalSpent,
-            amountColor: Colors.red,
+            amountColor: AppTheme.expenseColor,
           ),
 
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 16.0),
-            child: Divider(height: 1),
+            child: Divider(height: 1, color: Colors.white10),
           ),
 
           // Total Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(width: 40), // Spacer for alignment
+              const Spacer(),
               const Text(
                 'Total:',
                 style: TextStyle(
                   fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF333333),
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
                 ),
               ),
+              const SizedBox(width: 8),
               Obx(() {
                 final val = controller.netSavings.value;
                 return Text(
-                  '${val >= 0 ? '+' : ''}\$${val.toStringAsFixed(0)}', // Using $ or user's currency
+                  '${val >= 0 ? '+' : ''}${val.toStringAsFixed(0)}',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: val >= 0 ? Colors.green : Colors.red,
+                    color: val >= 0
+                        ? AppTheme.incomeColor
+                        : AppTheme.expenseColor,
                   ),
                 );
               }),
@@ -395,13 +430,13 @@ class StatsBody extends StatelessWidget {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF333333),
+            color: Colors.white,
           ),
         ),
         const Spacer(),
         Obx(
           () => Text(
-            '\$${amount.value.toStringAsFixed(0)}',
+            '${amount.value.toStringAsFixed(0)}',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -417,36 +452,34 @@ class StatsBody extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(
-          0xFF1E1E1E,
-        ), // Dark card for contrast like in design?
-        // Or keep light? The design used dark cards.
-        // Let's try DarkCard here for specific look or stick to light.
-        // User asked "in current theme". Current theme is mostly light.
-        // But "Like this" (image) shows dark cards.
-        // I will stick to Dark Card for "Average" to make it pop, or Light Card to be safe.
-        // Let's go with Dark Card to mimic the design structure more closely if "structure" implies the look.
-        // But the user said "current theme".
-        // I'll stick to Dark Background for this specific card to match the visual weight of the image's layout.
-        // color: const Color(0xFF2C2C2E),
-        borderRadius: BorderRadius.circular(20),
+        color: AppTheme.darkSurface,
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Average',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Average',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+              const Icon(Icons.more_vert, color: Colors.white54, size: 20),
+            ],
           ),
           const SizedBox(height: 4),
           Obx(
             () => Text(
               DateFormat('MMMM yyyy').format(controller.selectedDate.value),
-              style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.5),
+                fontSize: 12,
+              ),
             ),
           ),
           const SizedBox(height: 20),
@@ -487,9 +520,9 @@ class StatsBody extends StatelessWidget {
         ),
         Obx(
           () => Text(
-            '\$${income.value.toStringAsFixed(2)}',
-            style: const TextStyle(
-              color: Colors.green,
+            '${income.value.toStringAsFixed(0)}',
+            style: TextStyle(
+              color: AppTheme.incomeColor,
               fontSize: 15,
               fontWeight: FontWeight.w600,
             ),
@@ -497,13 +530,105 @@ class StatsBody extends StatelessWidget {
         ),
         Obx(
           () => Text(
-            '\$${expense.value.toStringAsFixed(2)}',
-            style: const TextStyle(
-              color: Colors.redAccent, // Slightly lighter red for dark bg
+            '${expense.value.toStringAsFixed(0)}',
+            style: TextStyle(
+              color: AppTheme.expenseColor,
               fontSize: 15,
               fontWeight: FontWeight.w600,
             ),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCompareCard(StatisticsController controller) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppTheme.darkSurface,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Compare',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+              const Icon(Icons.more_vert, color: Colors.white54, size: 20),
+            ],
+          ),
+          const SizedBox(height: 4),
+          // Comparison context - e.g., "vs Last Month"
+          Text(
+            'vs Last Month',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Dummy Comparison Bars for visual
+          _buildCompareRow('Income', 0.8, 0.7, AppTheme.incomeColor),
+          const SizedBox(height: 16),
+          _buildCompareRow('Expense', 0.5, 0.6, AppTheme.expenseColor),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompareRow(
+    String label,
+    double currentProgress,
+    double lastProgress,
+    Color color,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+            ),
+            Text(
+              '${((currentProgress - lastProgress) * 100).toStringAsFixed(0)}%',
+              style: TextStyle(
+                color: currentProgress >= lastProgress
+                    ? AppTheme.incomeColor
+                    : AppTheme.expenseColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Stack(
+          children: [
+            // Background
+            Container(height: 6, width: double.infinity, color: Colors.white10),
+            // Last Month (Greyed out or lighter)
+            FractionallySizedBox(
+              widthFactor: lastProgress,
+              child: Container(height: 6, color: color.withOpacity(0.3)),
+            ),
+            // Current Month
+            FractionallySizedBox(
+              widthFactor: currentProgress,
+              child: Container(height: 6, color: color),
+            ),
+          ],
         ),
       ],
     );
